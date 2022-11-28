@@ -1,4 +1,4 @@
-#include "../include/ct1.h"|
+#include "../include/ct1.h"
 
 extern void* crash_screen_copy_to_buf(void* dest, const char* src, u32 size);
 
@@ -7,6 +7,16 @@ extern void* crash_screen_copy_to_buf(void* dest, const char* src, u32 size);
 
 extern char textBuffer[0x200];
 extern char textBuffer2[0x200];
+
+typedef struct CustomThread {
+    /* 0x000 */ OSThread thread;
+    /* 0x1B0 */ char stack[0x800];
+    /* 0x9B0 */ OSMesgQueue queue;
+    /* 0x9C8 */ OSMesg mesg;
+    /* 0x9CC */ u16* frameBuf;
+    /* 0x9D0 */ u16 width;
+    /* 0x9D2 */ u16 height;
+} CustomThread; // size = 0x9D4
 
 
 //char buffer1[(0x80025C00 - 0x80000000)];
@@ -84,78 +94,13 @@ void print_fps(s32 x, s32 y) {
 
 int cBootMain(void) {
 	crash_screen_init();
+    set_gp();
+    stateFinishedBool = 0;
+    stateCooldown = 0;
 	return 1;
 }
 
-s32 printTextBool = 1;
-
-void mainCFunction(void) {
-    f32 xPos = 20.0f;
-    f32 yPos = 35.0f;
-    s32 arga2 = 0.0f;
-    f32 scale = 0.5f;
-    f32 arga4 = 0.0f;
-    f32 arga5 = 0.0f;
-    s32 style = 3;
-	
-	debugBool = 1;
-	currentFileLevelUnlocks = 0x13; //unlock all levels
-
-	if (p1ButtonsPressed == DPAD_UP) {
-		printTextBool ^= 1;
-	}
-
-	if (printTextBool == 1) {
-		if (P1Instance != NULL) {
-			_sprintf(textBuffer, "XPos: %.4f\n", p1.xPos);
-			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
-
-			yPos += 10.0f;
-
-			_sprintf(textBuffer, "YPos: %.4f\n", p1.yPos);
-			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
-
-			yPos += 10.0f;
-
-			_sprintf(textBuffer, "ZPos: %.4f\n", p1.zPos);
-			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
-
-			yPos += 10.0f;
-
-			_sprintf(textBuffer, "ANGL: %.4f\n", p1.yAngle);
-			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
-
-			yPos += 10.0f;
-
-			_sprintf(textBuffer, "VAUL: %02d\n", tongue.vaultTime);
-			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
-
-			yPos += 10.0f;
-		}
-	}
-
-    yPos = 220.0f;
-
-    _sprintf(textBuffer, "ANGL: %.4f\n", p1.yAngle);
-    _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-    convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-    printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
-
-	//print_fps(0, 0);
-}
-
-
-
+s32 printTextBool = 0;
 
 //800DCA90 osInvalICache
 //800DCB10 osInvalDCache
@@ -218,12 +163,36 @@ int __osPiDeviceBusy() {
     return 0;
 }
 
-void waitForRsp(void) {
+//80500000 (try 80480000 first)
 
-}
-    
+//skip 80000000 - 800EE1C0
+//800EE1C0 - 803B5000
 
-void savestateMain(void) {
+#define ramStartAddr 0x800EE1C0
+#define ramEndAddr 0x803B5000
+//#define ramEndAddr 0x80400000
+
+//GPR regs 80400000 - 80400080
+//FPR regs 80400080 - 80400100
+
+// void copyGPRRegs(void) {
+//     s32* GPRRegsAddr = (s32*)0x80400000;
+//     u32 baseInstruction = 0xACA00000; //SW r0, 0x0000 (a1)
+//     for (int i = 0; i < 32; i++) {
+//         executeASM( baseInstruction | (i << 16), &GPRRegsAddr[i]);
+//     }
+// }
+
+// void copyFPRRegs(void) {
+//     s32* FPRRegsAddr = (s32*)0x80400000;
+//     u32 baseInstruction = 0xE4A00000; //SWC1 f0, 0x0000 (a1)
+//     for (int i = 0; i < 32; i++) {
+//         executeASM( baseInstruction | (i << 16), &FPRRegsAddr[i]);
+//     }
+// }
+
+void loadstateMain(void) {
+    stateFinishedBool = 0;
 	pauseUntilDMANotBusy();
     
     //wait on rsp
@@ -239,7 +208,124 @@ void savestateMain(void) {
     while (__osPiDeviceBusy() == 1) {}
 
     //invalidate caches
-    osInvalICache(0x80000000, 0x2000); //osInvalICache
-	osInvalDCache(0x80000000, 0x2000); //osInvalDCache
+    osInvalICache((void*)0x80000000, 0x2000);
+	osInvalDCache((void*)0x80000000, 0x2000);
+    __osDisableInt();
+    customMemCpy(ramStartAddr, 0x80480000, ramEndAddr - ramStartAddr);
+    __osRestoreInt();
+    //loadRegsManual();
+    stateFinishedBool = 1;
+}
+    
+void savestateMain(void) {
+    stateFinishedBool = 0;
+    //copyRegsManual();
+	pauseUntilDMANotBusy();
+    
+    //wait on rsp
+    while (__osSpDeviceBusy() == 1) {}
 
+    //wait on rdp
+    while ( __osDpDeviceBusy() == 1) {}
+
+    //wait on SI
+    while (__osSiDeviceBusy() == 1) {}
+
+    //wait on PI
+    while (__osPiDeviceBusy() == 1) {}
+
+    //invalidate caches
+    osInvalICache((void*)0x80000000, 0x2000);
+	osInvalDCache((void*)0x80000000, 0x2000);
+
+    __osDisableInt();
+    customMemCpy(0x80480000, ramStartAddr, ramEndAddr - ramStartAddr);
+    __osRestoreInt();
+    stateFinishedBool = 1;
+}
+
+extern CustomThread gCustomThread;
+
+void mainCFunction(void) {
+    f32 xPos = 20.0f;
+    f32 yPos = 35.0f;
+    s32 arga2 = 0.0f;
+    f32 scale = 0.5f;
+    f32 arga4 = 0.0f;
+    f32 arga5 = 0.0f;
+    s32 style = 3;
+    volatile s32 threadBool = 0;
+	
+	debugBool = 1;
+	currentFileLevelUnlocks = 0x13; //unlock all levels
+
+	if (p1ButtonsPressed == DPAD_UP) {
+        if (stateCooldown == 0) {
+            osCreateThread(&gCustomThread.thread, 255, savestateMain, NULL,
+                    gCustomThread.stack + sizeof(gCustomThread.stack), 255);
+            osStartThread(&gCustomThread.thread);
+            stateCooldown = 5;
+        }
+	}
+
+	if (p1ButtonsPressed == DPAD_DOWN) {
+        if (stateCooldown == 0) {
+            osCreateThread(&gCustomThread.thread, 255, loadstateMain, NULL,
+                    gCustomThread.stack + sizeof(gCustomThread.stack), 255);
+            osStartThread(&gCustomThread.thread);
+            stateCooldown = 5;
+        }
+	}
+
+	if (printTextBool == 1) {
+		if (P1Instance != NULL) {
+			_sprintf(textBuffer, "XPos: %.4f\n", p1.xPos);
+			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+
+			yPos += 10.0f;
+
+			_sprintf(textBuffer, "YPos: %.4f\n", p1.yPos);
+			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+
+			yPos += 10.0f;
+
+			_sprintf(textBuffer, "ZPos: %.4f\n", p1.zPos);
+			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+
+			yPos += 10.0f;
+
+			_sprintf(textBuffer, "ANGL: %.4f\n", p1.yAngle);
+			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+
+			yPos += 10.0f;
+
+			_sprintf(textBuffer, "VAUL: %02d\n", tongue.vaultTime);
+			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+
+			yPos += 10.0f;
+		}
+	}
+
+    yPos = 220.0f;
+
+    _sprintf(textBuffer, "ANGL: %.4f\n", p1.yAngle);
+    _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+    convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+    printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+
+    if (stateCooldown > 0) {
+        stateCooldown--;
+    }
+
+	//print_fps(0, 0);
 }

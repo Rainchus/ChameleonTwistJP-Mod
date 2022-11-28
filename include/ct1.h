@@ -40,5 +40,8 @@ void osInvalDCache(void*, s32);
 int __osSpDeviceBusy();
 int __osSiDeviceBusy();
 
+extern volatile s32 stateCooldown;
+extern volatile s32 stateFinishedBool;
+
 
 #endif

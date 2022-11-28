@@ -26,9 +26,11 @@
 .definelabel __osSpDeviceBusy, 0x800E6800
 .definelabel __osSiDeviceBusy, 0x800EBBE0
 
-
+.definelabel stateCooldown, 0x8047FFF8
+.definelabel stateFinishedBool, 0x8047FFFC
 .definelabel customThread, 0x80400200
 .definelabel gCrashScreen, 0x80400300
+.definelabel gCustomThread, 0x80400400
 .definelabel osMemSize, 0x80000318
 .definelabel memcpy, 0x800EBF10
 //    .definelabel _Printf
@@ -107,15 +109,43 @@ LUI a1, 0x8010
 J 0x80090724
 LW a1, 0xFEB4 (a1)
 
-customMemCpy:
+customMemCpy: //requires 0x08 alignment
 BLEZ a2, exitMemCpy
-LW t0, 0x0000 (a1)
-SW t0, 0x0000 (a0)
-ADDIU a1, a1, 4
-ADDIU a0, a0, 4
+LD t0, 0x0000 (a1)
+SD t0, 0x0000 (a0)
+ADDIU a1, a1, 8
+ADDIU a0, a0, 8
 BEQ r0, r0, customMemCpy
-ADDIU a2, a2, -4
+ADDIU a2, a2, -8
 exitMemCpy:
+JR RA
+NOP
+
+set_gp:
+LUI gp, 0x8040
+JR RA
+ORI gp, gp, 0x0000
+
+
+executeASM:
+//a0 holds instruction
+//a1 address to store register value to
+ADDIU sp, sp, -0x20
+SW ra, 0x0018 (sp)
+JAL getPC
+NOP
+getPC:
+SW a0, 0x0010 (ra)
+NOP //buffer just in case
+NOP //buffer just in case
+NOP //buffer just in case
+NOP //(custom instruction goes here)
+LW ra, 0x0018 (sp)
+JR RA
+ADDIU sp, sp, 0x20
+
+
+copyRAM:
 JR RA
 NOP
 
@@ -205,6 +235,7 @@ dpExit:
 JR RA
 ADDIU sp, sp, 0x08
 
+.include "asm/registers.asm"
 .include "asm/printf.asm"
 
 .importobj "obj/crash.o"

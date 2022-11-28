@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "types.h": "c",
+        "ct1.h": "c",
+        "structs.h": "c"
+    }
+}

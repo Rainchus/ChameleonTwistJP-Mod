@@ -4,6 +4,12 @@
 #include "OS.h"
 #include "structs.h"
 
+
+#define KB *(1 <<10)
+#define MB *(1 <<20)
+#define GB *(1U<<30)
+extern int LZ4_compress_fast(const char* src, char* dest, int srcSize, int dstCapacity, int acceleration);
+
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
 
 typedef char *outfun(char*,const char*,unsigned int);

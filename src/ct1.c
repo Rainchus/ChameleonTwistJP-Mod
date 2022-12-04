@@ -4,13 +4,16 @@ extern void* crash_screen_copy_to_buf(void* dest, const char* src, u32 size);
 
 #define DPAD_UP 0x0800
 #define DPAD_DOWN 0x0400
+#define DPAD_LEFT 0x0200
+#define DPAD_RIGHT 0x0100
+#define L_BUTTON 0x0020
 
 extern char textBuffer[0x200];
 extern char textBuffer2[0x200];
 
 typedef struct CustomThread {
     /* 0x000 */ OSThread thread;
-    /* 0x1B0 */ char stack[0x800];
+    /* 0x1B0 */ char stack[0x4100];
     /* 0x9B0 */ OSMesgQueue queue;
     /* 0x9C8 */ OSMesg mesg;
     /* 0x9CC */ u16* frameBuf;
@@ -240,6 +243,7 @@ void savestateMain(void) {
 
     __osDisableInt();
     customMemCpy(0x80480000, ramStartAddr, ramEndAddr - ramStartAddr);
+    //LZ4_compress_fast(ramStartAddr, 0x80480000, ramEndAddr - ramStartAddr, 1 << 20, 1);
     __osRestoreInt();
     stateFinishedBool = 1;
 }
@@ -256,10 +260,10 @@ void mainCFunction(void) {
     s32 style = 3;
     volatile s32 threadBool = 0;
 	
-	debugBool = 1;
+	//debugBool = 1;
 	currentFileLevelUnlocks = 0x13; //unlock all levels
 
-	if (p1ButtonsPressed == DPAD_UP) {
+	if (p1ButtonsPressed == DPAD_LEFT) {
         if (stateCooldown == 0) {
             osCreateThread(&gCustomThread.thread, 255, savestateMain, NULL,
                     gCustomThread.stack + sizeof(gCustomThread.stack), 255);
@@ -268,7 +272,7 @@ void mainCFunction(void) {
         }
 	}
 
-	if (p1ButtonsPressed == DPAD_DOWN) {
+	if (p1ButtonsPressed == DPAD_RIGHT) {
         if (stateCooldown == 0) {
             osCreateThread(&gCustomThread.thread, 255, loadstateMain, NULL,
                     gCustomThread.stack + sizeof(gCustomThread.stack), 255);
@@ -276,6 +280,17 @@ void mainCFunction(void) {
             stateCooldown = 5;
         }
 	}
+
+    if ((p1ButtonsHeld & L_BUTTON) && (p1ButtonsPressed & DPAD_UP)) {
+        if (debugBool == 1) {
+            debugBool = 0;
+        } else if (debugBool == 0) {
+            debugBool = 1;
+        } else {
+            //if 0xFFFFFFFF
+            debugBool = 0;
+        }
+    }
 
 	if (printTextBool == 1) {
 		if (P1Instance != NULL) {
@@ -316,12 +331,12 @@ void mainCFunction(void) {
 		}
 	}
 
-    yPos = 220.0f;
+    // yPos = 220.0f;
 
-    _sprintf(textBuffer, "ANGL: %.4f\n", p1.yAngle);
-    _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-    convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-    printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+    // _sprintf(textBuffer, "ANGL: %.4f\n", p1.yAngle);
+    // _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+    // convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+    // printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
 
     if (stateCooldown > 0) {
         stateCooldown--;

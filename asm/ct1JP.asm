@@ -240,6 +240,7 @@ ADDIU sp, sp, 0x08
 
 .importobj "obj/crash.o"
 .importobj "obj/ct1.o"
+.importobj "obj/lz4.o"
 
 
 PAYLOAD_END:

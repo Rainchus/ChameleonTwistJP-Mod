@@ -215,6 +215,8 @@ void loadstateMain(void) {
 	osInvalDCache((void*)0x80000000, 0x2000);
     __osDisableInt();
     customMemCpy(ramStartAddr, 0x80480000, ramEndAddr - ramStartAddr);
+    //int result = LZ4_decompress_safe(0x80480000, ramStartAddr, savestate1Size, (ramEndAddr - ramStartAddr));
+    //LZ4_decompress_safe(0x80480000, ramStartAddr, savestate1Size, ramEndAddr - ramStartAddr);
     __osRestoreInt();
     //loadRegsManual();
     stateFinishedBool = 1;
@@ -243,7 +245,8 @@ void savestateMain(void) {
 
     __osDisableInt();
     customMemCpy(0x80480000, ramStartAddr, ramEndAddr - ramStartAddr);
-    //LZ4_compress_fast(ramStartAddr, 0x80480000, ramEndAddr - ramStartAddr, 1 << 20, 1);
+    //savestate1Size = LZ4_compress_default(ramStartAddr, 0x80480000, ramEndAddr - ramStartAddr, 1 << 20);
+
     __osRestoreInt();
     stateFinishedBool = 1;
 }

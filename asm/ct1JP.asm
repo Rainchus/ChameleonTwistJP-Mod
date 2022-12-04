@@ -58,6 +58,8 @@
 .definelabel textBuffer, 0x807F0000
 .definelabel textBuffer2, 0x807F0200
 
+.definelabel savestate1Size, 0x80400000
+
 
 
 //Payload related information

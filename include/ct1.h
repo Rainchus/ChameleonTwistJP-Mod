@@ -4,6 +4,16 @@
 #include "OS.h"
 #include "structs.h"
 
+#define ramStartAddr 0x800EE1C0
+#define ramEndAddr 0x803B5000
+
+extern s32 savestateCompressedSize;
+
+void compress_lz4_test2(const u8* srcData, int srcSize);
+void decompress_lz4_test2(int srcSize);
+extern void test_lz4(const u8* srcData, int srcSize);
+extern void* my_memcpy(void* dst, const void* src, s32 n);
+extern void* my_memmove(void* dest, const void* src, s32 n);
 
 #define KB *(1 <<10)
 #define MB *(1 <<20)
@@ -28,6 +38,8 @@ void _bzero(void* buffer, s32 size);
 extern s32 debugBool;
 void ct_memcpy(void* destination, void* src, s32 size);
 void customMemCpy(void* destination, void* src, s32 size);
+extern char compressBuffer[1024 * 1024];
+extern char decompressBuffer[ramEndAddr - ramStartAddr];
 
 extern u8 currentFileLevelUnlocks;
 extern s16 p1ButtonsHeld;
@@ -48,6 +60,8 @@ int __osSiDeviceBusy();
 
 extern volatile s32 stateCooldown;
 extern volatile s32 stateFinishedBool;
+
+typedef u8 uint8_t;
 
 
 #endif

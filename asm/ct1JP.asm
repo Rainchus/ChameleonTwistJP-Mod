@@ -58,6 +58,11 @@
 .definelabel textBuffer, 0x807F0000
 .definelabel textBuffer2, 0x807F0200
 
+.definelabel savestateCompressedSize, 0x807FFFF0
+
+.definelabel compressBuffer, 0x80500000
+.definelabel decompressBuffer, 0x800EE1C0
+
 
 
 //Payload related information
@@ -241,6 +246,7 @@ ADDIU sp, sp, 0x08
 .importobj "obj/crash.o"
 .importobj "obj/ct1.o"
 .importobj "obj/lz4.o"
+.importobj "obj/test.o"
 
 
 PAYLOAD_END:

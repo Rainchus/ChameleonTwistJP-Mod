@@ -171,8 +171,6 @@ int __osPiDeviceBusy() {
 //skip 80000000 - 800EE1C0
 //800EE1C0 - 803B5000
 
-#define ramStartAddr 0x800EE1C0
-#define ramEndAddr 0x803B5000
 //#define ramEndAddr 0x80400000
 
 //GPR regs 80400000 - 80400080
@@ -214,7 +212,8 @@ void loadstateMain(void) {
     osInvalICache((void*)0x80000000, 0x2000);
 	osInvalDCache((void*)0x80000000, 0x2000);
     __osDisableInt();
-    customMemCpy(ramStartAddr, 0x80480000, ramEndAddr - ramStartAddr);
+    //customMemCpy(ramStartAddr, 0x80480000, ramEndAddr - ramStartAddr);
+    decompress_lz4_test2(ramEndAddr - ramStartAddr);
     __osRestoreInt();
     //loadRegsManual();
     stateFinishedBool = 1;
@@ -242,7 +241,8 @@ void savestateMain(void) {
 	osInvalDCache((void*)0x80000000, 0x2000);
 
     __osDisableInt();
-    customMemCpy(0x80480000, ramStartAddr, ramEndAddr - ramStartAddr);
+    //customMemCpy(0x80480000, ramStartAddr, ramEndAddr - ramStartAddr);
+    compress_lz4_test2(ramStartAddr, ramEndAddr - ramStartAddr);
     //LZ4_compress_fast(ramStartAddr, 0x80480000, ramEndAddr - ramStartAddr, 1 << 20, 1);
     __osRestoreInt();
     stateFinishedBool = 1;

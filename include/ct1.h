@@ -18,7 +18,12 @@ extern void* my_memmove(void* dest, const void* src, s32 n);
 #define KB *(1 <<10)
 #define MB *(1 <<20)
 #define GB *(1U<<30)
+extern int LZ4_decompress_safe_withPrefix64k(const char* source, char* dest, int compressedSize, int maxOutputSize);
+extern int LZ4_decompress_safe(const char* source, char* dest, int compressedSize, int maxDecompressedSize);
 extern int LZ4_compress_fast(const char* src, char* dest, int srcSize, int dstCapacity, int acceleration);
+extern int LZ4_compress_default(const char* src, char* dst, int srcSize, int dstCapacity);
+
+extern s32 savestate1Size;
 
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
 

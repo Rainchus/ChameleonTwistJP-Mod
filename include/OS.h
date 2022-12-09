@@ -111,3 +111,35 @@ void osSetTime(u64 time);
 extern void		osViBlack(u8);
 extern void		osViRepeatLine(u8);
 extern void		osViSwapBuffer(void *);
+
+/*
+*************************************************************************
+ * Peripheral Interface (PI) Registers
+*/
+#define PI_BASE_REG		0x04600000
+
+/* PI DRAM address (R/W): [23:0] starting RDRAM address */
+#define PI_DRAM_ADDR_REG	(PI_BASE_REG+0x00)	/* DRAM address */
+
+/* PI pbus (cartridge) address (R/W): [31:0] starting AD16 address */
+#define PI_CART_ADDR_REG	(PI_BASE_REG+0x04)
+
+/* PI read length (R/W): [23:0] read data length */
+#define PI_RD_LEN_REG		(PI_BASE_REG+0x08)
+
+/* PI write length (R/W): [23:0] write data length */
+#define PI_WR_LEN_REG		(PI_BASE_REG+0x0C)
+
+/*
+ * PI status (R): [0] DMA busy, [1] IO busy, [2], error
+ *           (W): [0] reset controller (and abort current op), [1] clear intr
+ */
+#define PI_STATUS_REG		(PI_BASE_REG+0x10)
+
+#define PI_STATUS_DMA_BUSY  (1 << 0)
+#define PI_STATUS_IO_BUSY   (1 << 1)
+#define PI_STATUS_ERROR     (1 << 2)
+
+#define WAIT_ON_IOBUSY(stat)                                                                \
+    while (stat = IO_READ(PI_STATUS_REG), stat & (PI_STATUS_IO_BUSY | PI_STATUS_DMA_BUSY)); (void)0                                                                    \
+    

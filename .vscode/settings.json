@@ -2,6 +2,7 @@
     "files.associations": {
         "types.h": "c",
         "ct1.h": "c",
-        "structs.h": "c"
+        "structs.h": "c",
+        "lz4.h": "c"
     }
 }

@@ -3,13 +3,6 @@
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 
-typedef struct OSContPad {
-    unsigned short 	button;     /* Controller button data */
-    char  			stick_x;    /* Control stick's X coordinate position*/
-    char  			stick_y;    /* Control stick's Y coordinate position*/
-    unsigned char  	errno;      /* Error values returned from the Controller */
-} OSContPad;
-
 typedef struct {
     /* 0x000 */ OSThread thread;
     /* 0x1B0 */ char stack[0x800];
@@ -179,7 +172,7 @@ void crash_screen_printf(s32 x, s32 y, const char* fmt, ...) {
 
     va_start(args, fmt);
 
-    size = _Printf(crash_screen_copy_to_buf, buf, fmt, args);
+    size = _Printf((void*)crash_screen_copy_to_buf, (void*)buf, fmt, args);
 
     if (size > 0) {
         ptr = buf;
@@ -362,7 +355,7 @@ void crash_screen_printf_with_bg(s16 x, s16 y, const char* fmt, ...) {
 
     va_start(args, fmt);
 
-    size = _Printf(crash_screen_copy_to_buf, buf, fmt, args);
+    size = _Printf((void*)crash_screen_copy_to_buf, (void*)buf, fmt, args);
 
     if (size > 0) {
         crash_screen_draw_rect(x - 6, y - 6, (size + 2) * 6, 19);

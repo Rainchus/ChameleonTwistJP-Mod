@@ -11,7 +11,7 @@
 
 .definelabel p1ButtonsHeld, 0x80175680
 .definelabel p1ButtonsPressed, 0x80175684
-
+.definelabel freeCamActive, 0x8016AA98
 .definelabel P1Instance, 0x80174858
 .definelabel TongueInstance, 0x8017485C
 .definelabel _bzero, 0x800E0420
@@ -27,10 +27,9 @@
 .definelabel __osSiDeviceBusy, 0x800EBBE0
 
 .definelabel stateCooldown, 0x8047FFF8
-.definelabel stateFinishedBool, 0x8047FFFC
-.definelabel customThread, 0x80400200
-.definelabel gCrashScreen, 0x80400300
-.definelabel gCustomThread, 0x80400400
+//.definelabel stateFinishedBool, 0x8047FFFC
+.definelabel gCrashScreen, 0x80400100
+.definelabel gCustomThread, 0x80400200
 .definelabel osMemSize, 0x80000318
 .definelabel memcpy, 0x800EBF10
 //    .definelabel _Printf
@@ -46,19 +45,32 @@
 .definelabel osStartThread, 0x800D9B20
 .definelabel osGetTime, 0x800E01C0
 .definelabel __osCurrentTime, 0x8024C260
+.definelabel osContStartReadData, 0x800DB820
+.definelabel osContGetReadData, 0x800DB8E4
 .definelabel ct_strchr, 0x800EBF64
 .definelabel ct_strlen, 0x800EBF3C
 .definelabel __osDisableInt, 0x800E2BE0
 .definelabel __osRestoreInt, 0x800E2C00
 .definelabel debugBool, 0x800F06B0
-
 .definelabel currentFileLevelUnlocks, 0x80200B66
-
+.definelabel isPaused, 0x801749B4
 
 .definelabel textBuffer, 0x807F0000
 .definelabel textBuffer2, 0x807F0200
 
-.definelabel savestateCompressedSize, 0x807FFFF0
+.definelabel heldButtonsMain, 0x80175650
+.definelabel stateModeDisplay, 0x807FFFD4
+.definelabel saveOrLoadStateMode, 0x807FFFD8
+.definelabel savestateCurrentSlot, 0x807FFFDC
+.definelabel previouslyHeldButtons, 0x807FFFE0
+.definelabel previouslyPressedButtons, 0x807FFFE4
+.definelabel currentlyHeldButtons, 0x807FFFE8
+.definelabel currentlyPressedButtons, 0x807FFFEC
+.definelabel savestate1size, 0x807FFFF0
+.definelabel savestate2size, 0x807FFFF4
+.definelabel savestate3size, 0x807FFFF8
+
+.definelabel p1ControllerOS, 0x800F6888
 
 .definelabel compressBuffer, 0x80500000
 .definelabel decompressBuffer, 0x800EE1C0
@@ -246,7 +258,7 @@ ADDIU sp, sp, 0x08
 .importobj "obj/crash.o"
 .importobj "obj/ct1.o"
 .importobj "obj/lz4.o"
-.importobj "obj/test.o"
+.importobj "obj/lib.o"
 
 
 PAYLOAD_END:

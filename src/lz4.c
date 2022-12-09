@@ -65,7 +65,7 @@ int __clzsi2 (int val)
 
   for (; j; j >>= 1)
     {
-      if (temp = val >> j)
+      if ((temp = val) >> j)
 	{
 	  if (j == 1)
 	    {

@@ -112,6 +112,11 @@ extern "C" {
  *  - See tests/freestanding.c to check its basic setup.
  */
 
+//defined in test.c
+extern void* my_memmove(void* dest, const void* src, int n);
+extern void* my_memset(void* s, int c, int n);
+extern void* my_memcpy(void* dst, const void* src, int n);
+
 #define LZ4_FREESTANDING 1
 #define LZ4_memmove(dst, src, size) my_memmove((dst),(src),(size))
 #define LZ4_memcpy(dst, src, size)  my_memcpy((dst),(src),(size))

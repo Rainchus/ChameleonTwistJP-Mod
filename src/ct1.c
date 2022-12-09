@@ -2,18 +2,20 @@
 
 extern void* crash_screen_copy_to_buf(void* dest, const char* src, u32 size);
 
-#define DPAD_UP 0x0800
-#define DPAD_DOWN 0x0400
-#define DPAD_LEFT 0x0200
-#define DPAD_RIGHT 0x0100
-#define L_BUTTON 0x0020
+#define DPAD_UP 0x08000000
+#define DPAD_DOWN 0x04000000
+#define DPAD_LEFT 0x02000000
+#define DPAD_RIGHT 0x01000000
+#define L_BUTTON 0x00200000
 
-extern char textBuffer[0x200];
-extern char textBuffer2[0x200];
+#define SAVE_MODE 0
+#define LOAD_MODE 1
+
+s32 controllerData = 0x80175650;
 
 typedef struct CustomThread {
     /* 0x000 */ OSThread thread;
-    /* 0x1B0 */ char stack[0x4100];
+    /* 0x1B0 */ char stack[0x5000];
     /* 0x9B0 */ OSMesgQueue queue;
     /* 0x9C8 */ OSMesg mesg;
     /* 0x9CC */ u16* frameBuf;
@@ -21,14 +23,23 @@ typedef struct CustomThread {
     /* 0x9D2 */ u16 height;
 } CustomThread; // size = 0x9D4
 
+extern CustomThread gCustomThread;
+extern char textBuffer[0x200];
+extern char textBuffer2[0x200];
 
-//char buffer1[(0x80025C00 - 0x80000000)];
-//char buffer2[(0x80300000 - 0x800EE1C0)];
+s32 printTextBool = 0;
+
+int __osPiDeviceBusy() {
+    register u32 stat = IO_READ(PI_STATUS_REG);
+    if (stat & (PI_STATUS_DMA_BUSY | PI_STATUS_IO_BUSY))
+        return 1;
+    return 0;
+}
 
 void _sprintf(void* destination, void* fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    _Printf(crash_screen_copy_to_buf, &textBuffer, fmt, args);
+    _Printf((void*)crash_screen_copy_to_buf, (void*)&textBuffer, fmt, args);
     va_end(args);
 }
 
@@ -86,7 +97,6 @@ void print_fps(s32 x, s32 y) {
     s32 style = 3;
 
     f32 fps = calculate_and_update_fps();
-    char text[10];
 
 	_bzero(&textBuffer, sizeof(textBuffer)); //clear buffer
 	_sprintf(textBuffer, "FPS: %2.2f", fps);
@@ -98,15 +108,13 @@ void print_fps(s32 x, s32 y) {
 int cBootMain(void) {
 	crash_screen_init();
     set_gp();
-    stateFinishedBool = 0;
+    saveOrLoadStateMode = SAVE_MODE;
+    savestateCurrentSlot = 0;
+    stateModeDisplay = 1;
+    debugBool = 0;
     stateCooldown = 0;
 	return 1;
 }
-
-s32 printTextBool = 0;
-
-//800DCA90 osInvalICache
-//800DCB10 osInvalDCache
 
 void pauseUntilDMANotBusy(void) {
 	volatile s32* dmaBusyAddr = (s32*)0xA4600010;
@@ -116,84 +124,14 @@ void pauseUntilDMANotBusy(void) {
 	}
 }
 
-// s32 __osAiDeviceBusy(void) {
-//     register s32 status = IO_READ(AI_STATUS_REG);
-
-//     if (status & AI_STATUS_FIFO_FULL) {
-//         return TRUE;
-//     }
-
-//     return FALSE;
-// }
-
-/*
-*************************************************************************
- * Peripheral Interface (PI) Registers
-*/
-#define PI_BASE_REG		0x04600000
-
-/* PI DRAM address (R/W): [23:0] starting RDRAM address */
-#define PI_DRAM_ADDR_REG	(PI_BASE_REG+0x00)	/* DRAM address */
-
-/* PI pbus (cartridge) address (R/W): [31:0] starting AD16 address */
-#define PI_CART_ADDR_REG	(PI_BASE_REG+0x04)
-
-/* PI read length (R/W): [23:0] read data length */
-#define PI_RD_LEN_REG		(PI_BASE_REG+0x08)
-
-/* PI write length (R/W): [23:0] write data length */
-#define PI_WR_LEN_REG		(PI_BASE_REG+0x0C)
-
-/*
- * PI status (R): [0] DMA busy, [1] IO busy, [2], error
- *           (W): [0] reset controller (and abort current op), [1] clear intr
- */
-#define PI_STATUS_REG		(PI_BASE_REG+0x10)
-
-#define PI_STATUS_DMA_BUSY  (1 << 0)
-#define PI_STATUS_IO_BUSY   (1 << 1)
-#define PI_STATUS_ERROR     (1 << 2)
-
-#define WAIT_ON_IOBUSY(stat)                                                                \
-    while (stat = IO_READ(PI_STATUS_REG), stat & (PI_STATUS_IO_BUSY | PI_STATUS_DMA_BUSY))  \
-        ;                                                                                   \
-    (void)0
-
-int __osPiDeviceBusy() {
-    register u32 stat = IO_READ(PI_STATUS_REG);
-    if (stat & (PI_STATUS_DMA_BUSY | PI_STATUS_IO_BUSY))
-        return 1;
-    return 0;
-}
-
-//80500000 (try 80480000 first)
-
-//skip 80000000 - 800EE1C0
-//800EE1C0 - 803B5000
-
-//#define ramEndAddr 0x80400000
-
-//GPR regs 80400000 - 80400080
-//FPR regs 80400080 - 80400100
-
-// void copyGPRRegs(void) {
-//     s32* GPRRegsAddr = (s32*)0x80400000;
-//     u32 baseInstruction = 0xACA00000; //SW r0, 0x0000 (a1)
-//     for (int i = 0; i < 32; i++) {
-//         executeASM( baseInstruction | (i << 16), &GPRRegsAddr[i]);
-//     }
-// }
-
-// void copyFPRRegs(void) {
-//     s32* FPRRegsAddr = (s32*)0x80400000;
-//     u32 baseInstruction = 0xE4A00000; //SWC1 f0, 0x0000 (a1)
-//     for (int i = 0; i < 32; i++) {
-//         executeASM( baseInstruction | (i << 16), &FPRRegsAddr[i]);
-//     }
-// }
+#define ramAddrSavestateDataSlot1 (void*)0x80500000
+#define ramAddrSavestateDataSlot2 (void*)0x80600000
+#define ramAddrSavestateDataSlot3 (void*)0x80700000 //hopefully doesn't overflow into 0x807FFFDC (though if it does we were screwed anyway)
+#define DPAD_LEFT_CASE 0
+#define DPAD_UP_CASE 1
+#define DPAD_RIGHT_CASE 2
 
 void loadstateMain(void) {
-    stateFinishedBool = 0;
 	pauseUntilDMANotBusy();
     
     //wait on rsp
@@ -212,16 +150,28 @@ void loadstateMain(void) {
     osInvalICache((void*)0x80000000, 0x2000);
 	osInvalDCache((void*)0x80000000, 0x2000);
     __osDisableInt();
-    //customMemCpy(ramStartAddr, 0x80480000, ramEndAddr - ramStartAddr);
-    decompress_lz4_test2(ramEndAddr - ramStartAddr);
+    //decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate1Size, ramAddrSavestateDataSlot1); //always decompresses to `ramStartAddr`
+    switch (savestateCurrentSlot) {
+        case DPAD_LEFT_CASE:
+            if (savestate1Size != 0) {
+                decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate1Size, ramAddrSavestateDataSlot1); //always decompresses to `ramStartAddr`
+            }  
+        break;
+        case DPAD_UP_CASE:
+            if (savestate2Size != 0) {
+                decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate2Size, ramAddrSavestateDataSlot1); //always decompresses to `ramStartAddr`
+            }
+        break;
+        case DPAD_RIGHT_CASE:
+            if (savestate3Size != 0) {
+                decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate3Size, ramAddrSavestateDataSlot1); //always decompresses to `ramStartAddr`
+            }  
+        break;
+    }
     __osRestoreInt();
-    //loadRegsManual();
-    stateFinishedBool = 1;
 }
     
 void savestateMain(void) {
-    stateFinishedBool = 0;
-    //copyRegsManual();
 	pauseUntilDMANotBusy();
     
     //wait on rsp
@@ -241,16 +191,69 @@ void savestateMain(void) {
 	osInvalDCache((void*)0x80000000, 0x2000);
 
     __osDisableInt();
-    //customMemCpy(0x80480000, ramStartAddr, ramEndAddr - ramStartAddr);
-    compress_lz4_test2(ramStartAddr, ramEndAddr - ramStartAddr);
-    //LZ4_compress_fast(ramStartAddr, 0x80480000, ramEndAddr - ramStartAddr, 1 << 20, 1);
+    switch (savestateCurrentSlot) {
+        case DPAD_LEFT_CASE:
+            savestate1Size = compress_lz4_ct_default(ramStartAddr, ramEndAddr - ramStartAddr, ramAddrSavestateDataSlot1);
+        break;
+        case DPAD_UP_CASE:
+            savestate2Size = compress_lz4_ct_default(ramStartAddr, ramEndAddr - ramStartAddr, ramAddrSavestateDataSlot2);
+        break;
+        case DPAD_RIGHT_CASE:
+            savestate3Size = compress_lz4_ct_default(ramStartAddr, ramEndAddr - ramStartAddr, ramAddrSavestateDataSlot3);
+        break;
+    }
     __osRestoreInt();
-    stateFinishedBool = 1;
 }
 
-extern CustomThread gCustomThread;
+void updateCustomInputTracking(void) {
+    s32 temp;
+    temp = previouslyHeldButtons ^ heldButtonsMain; //if holding this frame and last frame, button wasn't pressed
+    temp ^= previouslyPressedButtons;
+    temp &= heldButtonsMain;
+    currentlyPressedButtons = temp;
 
-void mainCFunction(void) {
+    previouslyHeldButtons = heldButtonsMain;
+}
+
+void checkInputsForSavestates(void) {
+    savestateCurrentSlot = -1;//set to invalid
+
+    if (currentlyPressedButtons & DPAD_LEFT) {
+        savestateCurrentSlot = 0;
+    }
+
+    if (currentlyPressedButtons & DPAD_UP) {
+        savestateCurrentSlot = 1;
+    }
+
+    if (currentlyPressedButtons & DPAD_RIGHT) {
+        savestateCurrentSlot = 2;
+    }
+
+    if (savestateCurrentSlot == -1 || stateCooldown != 0){
+        return;
+    }
+
+    if (gameMode != GAME_MODE_STAGE_SELECT &&
+    gameMode != GAME_MODE_NEW_GAME_MENU &&
+    gameMode != GAME_MODE_TITLE_SCREEN &&
+    gameMode != GAME_MODE_JUNGLE_LAND_MENU &&
+    isPaused == 0) {
+        if (saveOrLoadStateMode == SAVE_MODE) {
+            osCreateThread(&gCustomThread.thread, 255, (void*)savestateMain, NULL,
+                    gCustomThread.stack + sizeof(gCustomThread.stack), 255);
+            osStartThread(&gCustomThread.thread);
+            stateCooldown = 5;
+        } else {
+            osCreateThread(&gCustomThread.thread, 255, (void*)loadstateMain, NULL,
+                    gCustomThread.stack + sizeof(gCustomThread.stack), 255);
+            osStartThread(&gCustomThread.thread);
+            stateCooldown = 5;            
+        }
+    }
+}
+
+void printCustomDebugText(void) {
     f32 xPos = 20.0f;
     f32 yPos = 35.0f;
     s32 arga2 = 0.0f;
@@ -258,39 +261,6 @@ void mainCFunction(void) {
     f32 arga4 = 0.0f;
     f32 arga5 = 0.0f;
     s32 style = 3;
-    volatile s32 threadBool = 0;
-	
-	//debugBool = 1;
-	currentFileLevelUnlocks = 0x13; //unlock all levels
-
-	if (p1ButtonsPressed == DPAD_LEFT) {
-        if (stateCooldown == 0) {
-            osCreateThread(&gCustomThread.thread, 255, savestateMain, NULL,
-                    gCustomThread.stack + sizeof(gCustomThread.stack), 255);
-            osStartThread(&gCustomThread.thread);
-            stateCooldown = 5;
-        }
-	}
-
-	if (p1ButtonsPressed == DPAD_RIGHT) {
-        if (stateCooldown == 0) {
-            osCreateThread(&gCustomThread.thread, 255, loadstateMain, NULL,
-                    gCustomThread.stack + sizeof(gCustomThread.stack), 255);
-            osStartThread(&gCustomThread.thread);
-            stateCooldown = 5;
-        }
-	}
-
-    if ((p1ButtonsHeld & L_BUTTON) && (p1ButtonsPressed & DPAD_UP)) {
-        if (debugBool == 1) {
-            debugBool = 0;
-        } else if (debugBool == 0) {
-            debugBool = 1;
-        } else {
-            //if 0xFFFFFFFF
-            debugBool = 0;
-        }
-    }
 
 	if (printTextBool == 1) {
 		if (P1Instance != NULL) {
@@ -330,17 +300,65 @@ void mainCFunction(void) {
 			yPos += 10.0f;
 		}
 	}
+}
 
-    // yPos = 220.0f;
+extern s32		osContStartReadData(OSMesgQueue *);
+extern void osContGetReadData(OSContPad *);
 
-    // _sprintf(textBuffer, "ANGL: %.4f\n", p1.yAngle);
-    // _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-    // convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-    // printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+// s32 readInputsWrapper(void) {
+//     OSContPad unkPtr;
+//     osContStartReadData(&unkPtr);
+//     osRecvMesg(&unkPtr, 0, 1);
+//     osContGetReadData(&unkPtr);
+//     osRecvMesg(&unkPtr, 0, 1);
+//     OSContPad* p1Pad = (u8*)0x80175650;
+//     p1Pad->button = unkPtr.button;
+//     p1Pad->stick_x = unkPtr.stick_x;
+//     p1Pad->stick_y = unkPtr.stick_y;
+//     return &unkPtr;
+// }
+
+void mainCFunction(void) {
+
+    //readInputsWrapper();
+    updateCustomInputTracking();
+	
+	//debugBool = 1;
+	currentFileLevelUnlocks = 0x13; //unlock all levels
+
+    if (stateCooldown == 0) {
+        if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_UP)) {
+            if (debugBool == 1) {
+                debugBool = 0;
+            } else if (debugBool == 0) {
+                debugBool = 1;
+            } else {
+                //if -1
+                debugBool = 0;
+            }
+        } else if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_DOWN)) {
+            stateModeDisplay ^= 1;
+        } else if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_RIGHT)) {
+            saveOrLoadStateMode ^= 1;
+        } else {
+            checkInputsForSavestates();
+        }
+    }
 
     if (stateCooldown > 0) {
         stateCooldown--;
     }
 
-	//print_fps(0, 0);
+    if (stateModeDisplay == 1) {
+        if (saveOrLoadStateMode == SAVE_MODE) {
+            textBuffer2[0] =  0xA3;
+            textBuffer2[1] = 0x60 + 's';
+        } else {
+            textBuffer2[0] = 0xA3;
+            textBuffer2[1] = 0x60 + 'l';
+        }
+        textBuffer2[2] = 0;
+
+        printText(13.0f, 218.0f, 0.0f, 0.65f, 0.0f, 0.0f, &textBuffer2, 3);
+    }
 }

@@ -15,7 +15,7 @@ s32 controllerData = 0x80175650;
 
 typedef struct CustomThread {
     /* 0x000 */ OSThread thread;
-    /* 0x1B0 */ char stack[0x5000];
+    /* 0x1B0 */ char stack[0xC000];
     /* 0x9B0 */ OSMesgQueue queue;
     /* 0x9C8 */ OSMesg mesg;
     /* 0x9CC */ u16* frameBuf;
@@ -132,8 +132,7 @@ void pauseUntilDMANotBusy(void) {
 #define DPAD_RIGHT_CASE 2
 
 void loadstateMain(void) {
-	pauseUntilDMANotBusy();
-    
+    s32 register status = getStatusRegister();
     //wait on rsp
     while (__osSpDeviceBusy() == 1) {}
 
@@ -168,12 +167,15 @@ void loadstateMain(void) {
             }  
         break;
     }
+    setStatusRegister(status);
     __osRestoreInt();
+    //force crash for testing
+    //asmCrashGame();
 }
     
 void savestateMain(void) {
-	pauseUntilDMANotBusy();
-    
+    //push status
+    s32 register status = getStatusRegister();
     //wait on rsp
     while (__osSpDeviceBusy() == 1) {}
 
@@ -202,6 +204,7 @@ void savestateMain(void) {
             savestate3Size = compress_lz4_ct_default(ramStartAddr, ramEndAddr - ramStartAddr, ramAddrSavestateDataSlot3);
         break;
     }
+    setStatusRegister(status);
     __osRestoreInt();
 }
 

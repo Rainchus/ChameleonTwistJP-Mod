@@ -79,7 +79,7 @@
 
 //Payload related information
 .definelabel PAYLOAD_START_ROM, 0xB315D0
-.definelabel PAYLOAD_START_RAM, 0x80400300
+.definelabel PAYLOAD_START_RAM, 0x80410000
 .definelabel CT_MOD_ROM, PAYLOAD_START_ROM + 0x1000
 .definelabel CT_MOD_RAM, PAYLOAD_START_RAM + 0x1000
 .definelabel PAYLOAD_SIZE, 0x0006E000 //end of rom - 0xB92000 to get this size
@@ -251,6 +251,28 @@ OR v0, r0, r0
 dpExit:
 JR RA
 ADDIU sp, sp, 0x08
+
+asmCrashGame:
+LUI t0, 0x8000
+ORI t0, t0, 0x0001
+LW t1, 0x0000 (t0)
+JR RA
+NOP
+
+getStatusRegister:
+MFC0 v0, $12
+NOP
+NOP
+JR RA
+NOP
+
+setStatusRegister:
+MTC0 a0, $12
+NOP
+NOP
+JR RA
+NOP
+
 
 .include "asm/registers.asm"
 .include "asm/printf.asm"

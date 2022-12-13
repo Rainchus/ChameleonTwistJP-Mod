@@ -40,6 +40,9 @@ extern s32 freeCamActive; //0 fixed cam, 1 free cam
 extern s32 stateModeDisplay;
 extern s32 isPaused;
 
+extern int getStatusRegister(void); //returns status reg
+extern int setStatusRegister(s32); //returns status reg
+
 extern void test_lz4(const u8* srcData, int srcSize);
 extern void* my_memcpy(void* dst, const void* src, s32 n);
 extern void* my_memmove(void* dest, const void* src, s32 n);
@@ -65,7 +68,7 @@ void customMemCpy(void* destination, void* src, s32 size);
 void infiniteLoop(void);
 s32 ct_strlen(char* string);
 void set_gp(void);
-extern char compressBuffer[1024 * 1024];
+// extern char compressBuffer[1024 * 1024];
 extern char decompressBuffer[0x803B5000 - 0x800EE1C0];
 
 

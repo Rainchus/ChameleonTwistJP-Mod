@@ -12,15 +12,17 @@ PRINT := printf '
  ENDPURPLE := $(ENDCOLOR)
 ENDLINE := \n'
 
+OPTFLAGS := -O2
+
 all:
 	@mkdir -p obj
 
 	@$(PRINT)$(GREEN)Compiling C file: $(ENDGREEN)$(BLUE)crash.c$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
-	@mips64-elf-gcc -Wall -O2 -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/crash.c
+	@mips64-elf-gcc -Wall $(OPTFLAGS) -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/crash.c
 	@mv crash.o obj/
 
 	@$(PRINT)$(GREEN)Compiling C file: $(ENDGREEN)$(BLUE)ct1.c$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
-	@mips64-elf-gcc -Wall -O2 -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/ct1.c
+	@mips64-elf-gcc -Wall $(OPTFLAGS) -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/ct1.c
 	@mv ct1.o obj/
 
 	@$(PRINT)$(GREEN)Compiling C file: $(ENDGREEN)$(BLUE)lz4.c$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
@@ -28,7 +30,7 @@ all:
 	@mv lz4.o obj/
 
 	@$(PRINT)$(GREEN)Compiling C file: $(ENDGREEN)$(BLUE)lib.c$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
-	@mips64-elf-gcc -Wall -O2 -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/lib.c
+	@mips64-elf-gcc -Wall $(OPTFLAGS) -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/lib.c
 	@mv lib.o obj/
 
 	@$(PRINT)$(GREEN)armips $(ENDGREEN)$(BLUE)asm/main.asm$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)

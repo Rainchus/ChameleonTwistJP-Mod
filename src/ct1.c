@@ -341,7 +341,7 @@ void mainCFunction(void) {
             }
         } else if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_DOWN)) {
             stateModeDisplay ^= 1;
-        } else if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_RIGHT)) {
+        } else if (currentlyPressedButtons & DPAD_DOWN) {
             saveOrLoadStateMode ^= 1;
         } else {
             checkInputsForSavestates();

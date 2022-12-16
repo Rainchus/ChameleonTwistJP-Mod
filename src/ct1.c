@@ -158,12 +158,12 @@ void loadstateMain(void) {
         break;
         case DPAD_UP_CASE:
             if (savestate2Size != 0) {
-                decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate2Size, ramAddrSavestateDataSlot1); //always decompresses to `ramStartAddr`
+                decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate2Size, ramAddrSavestateDataSlot2); //always decompresses to `ramStartAddr`
             }
         break;
         case DPAD_RIGHT_CASE:
             if (savestate3Size != 0) {
-                decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate3Size, ramAddrSavestateDataSlot1); //always decompresses to `ramStartAddr`
+                decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate3Size, ramAddrSavestateDataSlot3); //always decompresses to `ramStartAddr`
             }  
         break;
     }

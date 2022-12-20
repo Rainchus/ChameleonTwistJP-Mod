@@ -325,7 +325,13 @@ void mainCFunction(void) {
 
     //readInputsWrapper();
     updateCustomInputTracking();
-	
+
+    if (gameMode == GAME_MODE_OVERWORLD){
+        if (isPaused == 0) {
+            drawTimer();
+        }
+    }
+
 	//debugBool = 1;
 	currentFileLevelUnlocks = 0x13; //unlock all levels
 

@@ -75,6 +75,8 @@
 .definelabel compressBuffer, 0x80500000
 .definelabel decompressBuffer, 0x800EE1C0
 
+.definelabel drawTimer, 0x80089BA8
+
 
 
 //Payload related information
@@ -95,6 +97,9 @@ LUI a2, hi(PAYLOAD_SIZE)
 JAL dma_copy
 ADDIU a2, a2, lo(PAYLOAD_SIZE)
 J originalCode
+NOP
+
+.org 0x80089BB4 //in game time hook
 NOP
 
 .org 0x8009071C //per frame hook (at beginning of gamemode step loop)

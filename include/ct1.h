@@ -40,6 +40,8 @@ extern s32 freeCamActive; //0 fixed cam, 1 free cam
 extern s32 stateModeDisplay;
 extern s32 isPaused;
 
+extern void drawTimer(void);
+
 extern int getStatusRegister(void); //returns status reg
 extern int setStatusRegister(s32); //returns status reg
 

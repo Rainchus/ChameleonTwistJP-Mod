@@ -283,6 +283,7 @@ NOP
 .include "asm/printf.asm"
 
 .importobj "obj/crash.o"
+.importobj "obj/print.o"
 .importobj "obj/ct1.o"
 .importobj "obj/lz4.o"
 .importobj "obj/lib.o"

@@ -90,10 +90,7 @@ f32 calculate_and_update_fps(void) {
 void print_fps(s32 x, s32 y) {
     f32 xPos = 20.0f;
     f32 yPos = 220.0f;
-    s32 arga2 = 0.0f;
     f32 scale = 0.5f;
-    f32 arga4 = 0.0f;
-    f32 arga5 = 0.0f;
     s32 style = 3;
 
     f32 fps = calculate_and_update_fps();
@@ -102,7 +99,7 @@ void print_fps(s32 x, s32 y) {
 	_sprintf(textBuffer, "FPS: %2.2f", fps);
 	_bzero(&textBuffer2, sizeof(textBuffer2)); //clear buffer
 	convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-	printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+    textPrint(xPos, yPos, scale, &textBuffer2, style);
 }
 
 int cBootMain(void) {
@@ -259,10 +256,7 @@ void checkInputsForSavestates(void) {
 void printCustomDebugText(void) {
     f32 xPos = 20.0f;
     f32 yPos = 35.0f;
-    s32 arga2 = 0.0f;
     f32 scale = 0.5f;
-    f32 arga4 = 0.0f;
-    f32 arga5 = 0.0f;
     s32 style = 3;
 
 	if (printTextBool == 1) {
@@ -270,35 +264,35 @@ void printCustomDebugText(void) {
 			_sprintf(textBuffer, "XPos: %.4f\n", p1.xPos);
 			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
 			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+            textPrint(xPos, yPos, scale, &textBuffer2, style);
 
 			yPos += 10.0f;
 
 			_sprintf(textBuffer, "YPos: %.4f\n", p1.yPos);
 			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
 			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+			textPrint(xPos, yPos, scale, &textBuffer2, style);
 
 			yPos += 10.0f;
 
 			_sprintf(textBuffer, "ZPos: %.4f\n", p1.zPos);
 			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
 			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+			textPrint(xPos, yPos, scale, &textBuffer2, style);
 
 			yPos += 10.0f;
 
 			_sprintf(textBuffer, "ANGL: %.4f\n", p1.yAngle);
 			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
 			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+			textPrint(xPos, yPos, scale, &textBuffer2, style);
 
 			yPos += 10.0f;
 
 			_sprintf(textBuffer, "VAUL: %02d\n", tongue.vaultTime);
 			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
 			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+			textPrint(xPos, yPos, scale, &textBuffer2, style);
 
 			yPos += 10.0f;
 		}
@@ -362,7 +356,7 @@ void mainCFunction(void) {
         }
         textBuffer2[2] = 0;
 
-        printText(13.0f, 218.0f, 0.0f, 0.65f, 0.0f, 0.0f, &textBuffer2, 3);
+        textPrint(13.0f, 208.0f, 0.65f, &textBuffer2, 3);
         if (gameMode == GAME_MODE_OVERWORLD){
         if (isPaused == 0) {
             drawTimer();

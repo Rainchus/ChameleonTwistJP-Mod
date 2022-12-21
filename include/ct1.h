@@ -4,6 +4,8 @@
 #include "OS.h"
 #include "structs.h"
 
+#include "print.h"  // Custom Printing Functions
+
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
 #define ramStartAddr (void*)0x800EE1C0
 #define ramEndAddr (void*)0x803B5000

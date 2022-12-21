@@ -1,15 +1,26 @@
-# ChameleonTwistJP-Mod
+# PracTwist v0.2
 
-A basic mod for JP chameleon twist that adds 3 savestate slots and the crash screen from Paper Mario</br>
-Also included is a toggle for the in game debug mode that exist</br>
+A speedrun practice mod for the JP chameleon twist rom that adds save states; a crash screen and an in game timer.
+Also included is a toggle for the in game debug mode that exists.</br>
+
+### Version 0.2 Notes:
+- Added In Game Timer Display 
+- Added Hiding IGTimer and Save/Load Text to the "Hide Text Toggle"
+
+### Planned Features:
+- A menu to allow for easier control and less hotkey confusion
+- A setting to refresh the room the player is currently in
+    - This will allow the user to choose cycle timings to practice
+- A mode to highlight collision of objects
+
 
 # Controls
-Dpad-left access savestate slot 1</br>
-Dpad-up access savestate slot 2</br>
-Dpad-right access savestate slot 3</br>
-Dpad-down toggle between `save` and `load` mode</br>
-Holding L and pressing dpad-up will toggle the in game debug mode</br>
-Holding L and pressing dpad-down will toggle the printing of the `S` or `L` for the save/load mode</br>
+`Dpad-left` access savestate slot 1</br>
+`Dpad-up` access savestate slot 2</br>
+`Dpad-right` access savestate slot 3</br>
+`Dpad-down` toggle between `save` and `load` mode</br>
+`Holding L` and pressing `dpad-up` will toggle the in game debug mode</br>
+`Holding L` and pressing `dpad-down` will toggle the printing of mod text and timers</br>
 
 # Usage
 The savestates have a saving and loading mode. To toggle between them, use `dpad-down`</br>

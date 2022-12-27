@@ -39,6 +39,7 @@ extern u32 osMemSize;
 extern s32 freeCamActive; //0 fixed cam, 1 free cam
 extern s32 stateModeDisplay;
 extern s32 isPaused;
+extern s32 pauseFrameCountMode;
 
 extern int getStatusRegister(void); //returns status reg
 extern int setStatusRegister(s32); //returns status reg
@@ -70,7 +71,10 @@ s32 ct_strlen(char* string);
 void set_gp(void);
 // extern char compressBuffer[1024 * 1024];
 extern char decompressBuffer[0x803B5000 - 0x800EE1C0];
+extern s32 isTakingLoadingZone;
+extern s32 pauseFrameCount;
 
+void playSound(s32, void*, s32);
 
 typedef u64	OSTime;
 #define	OS_CLOCK_RATE		62500000LL
@@ -83,6 +87,7 @@ void osInvalDCache(void*, s32);
 int __osDpDeviceBusy();
 int __osSpDeviceBusy();
 int __osSiDeviceBusy();
+extern s32 rngSeed;
 
 extern s32 gameMode;
 extern volatile s32 savestateCurrentSlot;

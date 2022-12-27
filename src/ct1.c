@@ -315,13 +315,38 @@ extern void osContGetReadData(OSContPad *);
 //     return &unkPtr;
 // }
 
+void teleportToStageBoss(void) {
+    // Teleports Player to Current World's Boss Stage
+    if ((gameMode == GAME_MODE_OVERWORLD) && (currLevel < 0x06)) {
+        loadBoss();
+    }
+}
+
+void givePlayerMaxCrowns(void) {
+    // Gives Player Max Crowns
+    if (gameMode == GAME_MODE_OVERWORLD) {
+        jlCrowns = 25;
+        alCrowns = 25;
+        blCrowns = 21;
+        klCrowns = 23;
+        dcCrowns = 24;
+        gcCrowns = 23;
+    }
+}
+
 void mainCFunction(void) {
+
+    // Max out player 1 health
+    p1Health = 0x0A;
 
     //readInputsWrapper();
     updateCustomInputTracking();
 
+    blackWhiteUnlock = 0x0C;
+
 	//debugBool = 1;
-	currentFileLevelUnlocks = 0x13; //unlock all levels
+	currentFileLevelUnlocks = 0xFF; //unlock all levels
+    currentFileLevelUnlocks2 = 0xFF; //unlock all levels
 
     if (stateCooldown == 0) {
         if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_UP)) {
@@ -334,7 +359,8 @@ void mainCFunction(void) {
                 debugBool = 0;
             }
         } else if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_DOWN)) {
-            stateModeDisplay ^= 1;
+            //stateModeDisplay ^= 1;
+            teleportToStageBoss();    // Using L+D_DOWN as test func
         } else if (currentlyPressedButtons & DPAD_DOWN) {
             saveOrLoadStateMode ^= 1;
         } else {

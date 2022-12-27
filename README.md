@@ -1,11 +1,13 @@
-# PracTwist v0.2
+# PracTwist v0.2.1
 
 A speedrun practice mod for the JP chameleon twist rom that adds save states; a crash screen and an in game timer.
 Also included is a toggle for the in game debug mode that exists.</br>
 
-### Version 0.2 Notes:
-- Added In Game Timer Display 
-- Added Hiding IGTimer and Save/Load Text to the "Hide Text Toggle"
+### Version 0.2.1 Notes:
+- Maxed Player Health
+- Added Function to Max Crown Count
+- Default Unlocked Boss Rush Mode
+- Added White and Black Chameleons as Playable
 
 ### Planned Features:
 - A menu to allow for easier control and less hotkey confusion

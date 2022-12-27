@@ -34,6 +34,7 @@ extern Tongue* TongueInstance;
 extern playerActor p1;
 extern Tongue tongue;
 extern u8 currentFileLevelUnlocks;
+extern u8 currentFileLevelUnlocks2;
 extern s16 p1ButtonsHeld;
 extern s16 p1ButtonsPressed;
 extern u64 __osCurrentTime;
@@ -41,8 +42,21 @@ extern u32 osMemSize;
 extern s32 freeCamActive; //0 fixed cam, 1 free cam
 extern s32 stateModeDisplay;
 extern s32 isPaused;
+extern s8 currLevel;
+
+extern s8 p1Health; 
+extern s8 jlCrowns;
+extern s8 alCrowns;
+extern s8 blCrowns;
+extern s8 klCrowns;
+extern s8 dcCrowns;
+extern s8 gcCrowns;
+extern u8 blackWhiteUnlock;
+
+void givePlayerMaxCrowns(void);
 
 extern void drawTimer(void);
+extern void loadBoss(void);
 
 extern int getStatusRegister(void); //returns status reg
 extern int setStatusRegister(s32); //returns status reg

@@ -360,7 +360,7 @@ void mainCFunction(void) {
             }
         } else if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_DOWN)) {
             //stateModeDisplay ^= 1;
-            teleportToStageBoss();    // Using L+D_DOWN as test func
+            //teleportToStageBoss();    // Using L+D_DOWN as test func
         } else if (currentlyPressedButtons & DPAD_DOWN) {
             saveOrLoadStateMode ^= 1;
         } else {

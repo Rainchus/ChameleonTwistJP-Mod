@@ -15,6 +15,9 @@ Also included is a toggle for the in game debug mode that exists.</br>
     - This will allow the user to choose cycle timings to practice
 - A mode to highlight collision of objects
 
+# How to patch
+Take a vanilla chameleon twist 1 jp rom in `.z64 format` and patch it using the `.bps` file at this site https://hack64.net/tools/patcher.php</br></br>
+If you rom isn't `.z64` format, this site can swap it to that format https://hack64.net/tools/swapper.php
 
 # Controls
 `Dpad-left` access savestate slot 1</br>

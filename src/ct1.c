@@ -27,7 +27,7 @@ extern CustomThread gCustomThread;
 extern char textBuffer[0x200];
 extern char textBuffer2[0x200];
 
-s32 printTextBool = 0;
+s32 printTextBool = 1;
 
 int __osPiDeviceBusy() {
     register u32 stat = IO_READ(PI_STATUS_REG);
@@ -87,7 +87,7 @@ f32 calculate_and_update_fps(void) {
     return (1000000.0f * FRAMETIME_COUNT * (OS_CPU_COUNTER/15625.0f) / (1000000.0f/15625.0f)) / (f32)(newTime - oldTime);
 }
 
-void print_fps(s32 x, s32 y) {
+void print_fps(void) {
     f32 xPos = 20.0f;
     f32 yPos = 220.0f;
     f32 scale = 0.5f;
@@ -121,9 +121,9 @@ void pauseUntilDMANotBusy(void) {
 	}
 }
 
-#define ramAddrSavestateDataSlot1 (void*)0x80500000
-#define ramAddrSavestateDataSlot2 (void*)0x80600000
-#define ramAddrSavestateDataSlot3 (void*)0x80700000 //hopefully doesn't overflow into 0x807FFFDC (though if it does we were screwed anyway)
+#define ramAddrSavestateDataSlot1 (void*)0x804C0000
+#define ramAddrSavestateDataSlot2 (void*)0x805D0000
+#define ramAddrSavestateDataSlot3 (void*)0x806E0000 //hopefully doesn't overflow into 0x807FFFDC (though if it does we were screwed anyway)
 #define DPAD_LEFT_CASE 0
 #define DPAD_UP_CASE 1
 #define DPAD_RIGHT_CASE 2
@@ -149,25 +149,23 @@ void loadstateMain(void) {
     //decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate1Size, ramAddrSavestateDataSlot1); //always decompresses to `ramStartAddr`
     switch (savestateCurrentSlot) {
         case DPAD_LEFT_CASE:
-            if (savestate1Size != 0) {
+            if (savestate1Size != 0 && savestate1Size != -1) {
                 decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate1Size, ramAddrSavestateDataSlot1); //always decompresses to `ramStartAddr`
             }  
         break;
         case DPAD_UP_CASE:
-            if (savestate2Size != 0) {
+            if (savestate2Size != 0 && savestate2Size != -1) {
                 decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate2Size, ramAddrSavestateDataSlot2); //always decompresses to `ramStartAddr`
             }
         break;
         case DPAD_RIGHT_CASE:
-            if (savestate3Size != 0) {
+            if (savestate3Size != 0 && savestate3Size != -1) {
                 decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate3Size, ramAddrSavestateDataSlot3); //always decompresses to `ramStartAddr`
             }  
         break;
     }
     setStatusRegister(status);
     __osRestoreInt();
-    //force crash for testing
-    //asmCrashGame();
 }
     
 void savestateMain(void) {
@@ -261,41 +259,45 @@ void printCustomDebugText(void) {
 
 	if (printTextBool == 1) {
 		if (P1Instance != NULL) {
-			_sprintf(textBuffer, "XPos: %.4f\n", p1.xPos);
-			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-            textPrint(xPos, yPos, scale, &textBuffer2, style);
+			//_sprintf(textBuffer, "XPos: %.4f\n", p1.xPos);
+			//_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			//convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+            //textPrint(xPos, yPos, scale, &textBuffer2, style);
 
-			yPos += 10.0f;
+			//yPos += 10.0f;
 
-			_sprintf(textBuffer, "YPos: %.4f\n", p1.yPos);
-			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			textPrint(xPos, yPos, scale, &textBuffer2, style);
+			//_sprintf(textBuffer, "YPos: %.4f\n", p1.yPos);
+			//_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			//convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			//textPrint(xPos, yPos, scale, &textBuffer2, style);
 
-			yPos += 10.0f;
+			//yPos += 10.0f;
 
-			_sprintf(textBuffer, "ZPos: %.4f\n", p1.zPos);
-			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			textPrint(xPos, yPos, scale, &textBuffer2, style);
+			//_sprintf(textBuffer, "ZPos: %.4f\n", p1.zPos);
+			//_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			//convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			//textPrint(xPos, yPos, scale, &textBuffer2, style);
 
-			yPos += 10.0f;
+			//yPos += 10.0f;
 
-			_sprintf(textBuffer, "ANGL: %.4f\n", p1.yAngle);
-			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			textPrint(xPos, yPos, scale, &textBuffer2, style);
+			//_sprintf(textBuffer, "ANGL: %.4f\n", p1.yAngle);
+			//_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			//convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			//textPrint(xPos, yPos, scale, &textBuffer2, style);
 
-			yPos += 10.0f;
+			//yPos += 10.0f;
 
-			_sprintf(textBuffer, "VAUL: %02d\n", tongue.vaultTime);
-			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			textPrint(xPos, yPos, scale, &textBuffer2, style);
+			//_sprintf(textBuffer, "VAUL: %02d\n", tongue.vaultTime);
+			//_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			//convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			//textPrint(xPos, yPos, scale, &textBuffer2, style);
 
 			yPos += 10.0f;
 		}
+        _sprintf(textBuffer, "RNG: %08X\n", rngSeed);
+		_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+		convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+		printText(xPos, yPos, 0, scale, 0, 0, &textBuffer2, style);
 	}
 }
 
@@ -334,13 +336,52 @@ void givePlayerMaxCrowns(void) {
     }
 }
 
+//80168DA8
+
+
+void printPausePractice(void) {
+    f32 xPos = 20.0f;
+    f32 yPos = 35.0f;
+    s32 arga2 = 0.0f;
+    f32 scale = 0.5f;
+    f32 arga4 = 0.0f;
+    f32 arga5 = 0.0f;
+    s32 style = 3;
+
+    if (isTakingLoadingZone == TRUE) {
+        if (pauseFrameCountMode != 1) {
+            //count frames
+            pauseFrameCount++;
+            if (pauseFrameCount == 8) { //is pause frame
+                playSound(0x2A, (void*)0x80168DA8, 0);
+                return;
+            } else if (pauseFrameCount > 8 && pauseFrameCount < 30) {
+                _sprintf(textBuffer, "Pause\n");
+                _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+                convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+                printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+            }
+        }
+    } else {
+        //on the 11th frame when entering a boss fight, isTakingLoadingZone is FALSE for a single frame
+        if (pauseFrameCount != 11) {
+            pauseFrameCount = 0;
+        } else {
+            pauseFrameCount++;
+        }
+    }
+}
+
 void mainCFunction(void) {
 
     // Max out player 1 health
     p1Health = 0x0A;
 
     //readInputsWrapper();
+    //printCustomDebugText();
     updateCustomInputTracking();
+    printPausePractice();
+    //print_fps();
 
     blackWhiteUnlock = 0x0C;
 
@@ -359,7 +400,7 @@ void mainCFunction(void) {
                 debugBool = 0;
             }
         } else if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_DOWN)) {
-            //stateModeDisplay ^= 1;
+            stateModeDisplay ^= 1;
             //teleportToStageBoss();    // Using L+D_DOWN as test func
         } else if (currentlyPressedButtons & DPAD_DOWN) {
             saveOrLoadStateMode ^= 1;

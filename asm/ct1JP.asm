@@ -12,7 +12,6 @@
 
 .definelabel blackWhiteUnlock, 0x80200C01
 
-
 // Funcs //
 
 .definelabel gameMode, 0x800FFEB4
@@ -33,6 +32,7 @@
 .definelabel P1Instance, 0x80174858
 .definelabel TongueInstance, 0x8017485C
 .definelabel _bzero, 0x800E0420
+.definelabel rngSeed, 0x800F6884
 
 .definelabel p1, 0x80168DA8
 .definelabel tongue, 0x80169268
@@ -73,11 +73,15 @@
 .definelabel currentFileLevelUnlocks, 0x80200B66
 .definelabel currentFileLevelUnlocks2, 0x80200B68
 .definelabel isPaused, 0x801749B4
+.definelabel isTakingLoadingZone, 0x80176F58
+.definelabel playSound, 0x80087ED0
 
 .definelabel textBuffer, 0x807F0000
 .definelabel textBuffer2, 0x807F0200
 
 .definelabel heldButtonsMain, 0x80175650
+.definelabel pauseFrameCountMode, 0x807FFFCC
+.definelabel pauseFrameCount, 0x807FFFD0
 .definelabel stateModeDisplay, 0x807FFFD4
 .definelabel saveOrLoadStateMode, 0x807FFFD8
 .definelabel savestateCurrentSlot, 0x807FFFDC

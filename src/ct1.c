@@ -299,7 +299,7 @@ void printCustomDebugText(void) {
         _sprintf(textBuffer, "RNG: %08X\n", rngSeed);
 		_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
 		convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-		printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+		printText(xPos, yPos, 0, scale, 0, 0, &textBuffer2, style);
 	}
 }
 

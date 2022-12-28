@@ -310,6 +310,7 @@ s32 teleportToStageBoss(void) {
     return 1;
 }
 
+// Not Useful Now we have Game State Flag
 s32 givePlayerMaxCrowns(void) {
     // Gives Player Max Crowns
     if (gameMode == GAME_MODE_OVERWORLD) {
@@ -413,6 +414,11 @@ void mainCFunction(void) {
                     drawTimer();
                 }
             }
+        }
+
+        if (toggles[TOGGLE_CUSTOM_DEBUG_TEXT] == 1) {
+            colorTextWrapper(textWhiteColor);
+            printCustomDebugText();
         }
         
     }

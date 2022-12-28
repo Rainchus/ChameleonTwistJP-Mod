@@ -21,14 +21,23 @@ extern u8 menuIsActive;
 #define A_BUTTON 0x80000000
 
 extern u8 toggles[];
+extern s32 textWhiteColor[];
 
 enum Toggles {
     TOGGLE_HIDE_SAVESTATE_TEXT,
     TOGGLE_HIDE_IGT,
-    TOGGLE_INFINITE_HEALTH
+    TOGGLE_INFINITE_HEALTH,
+    TOGGLE_CUSTOM_DEBUG_TEXT,
 };
 
+// Menu //
 extern void updateMenuInput(void);
+s32 givePlayerMaxCrowns(void);
+extern void drawTimer(void);
+extern void loadBoss(void);
+// End Menu //
+
+
 
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
 #define ramStartAddr (void*)0x800EE1C0
@@ -90,15 +99,14 @@ extern s8 dcCrowns;
 extern s8 gcCrowns;
 extern u8 blackWhiteUnlock;         // Flag (0x0C)
 
-s32 givePlayerMaxCrowns(void);
+
 // End All Unlocks //
 
 // SFX // 
 void playSound(s32, void*, s32);
 // End SFX //
 
-extern void drawTimer(void);
-extern void loadBoss(void);
+
 
 extern int getStatusRegister(void); //returns status reg
 extern int setStatusRegister(s32); //returns status reg

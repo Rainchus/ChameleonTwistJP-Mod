@@ -5,6 +5,13 @@
 #include "structs.h"
 
 #include "print.h"  // Custom Printing Functions
+#include "menu.h"   // Custom Menu Functions
+
+extern s32 currPageNo;
+extern s32 currOptionNo;
+extern u8 menuIsActive;
+
+extern void updateMenuInput(void);
 
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
 #define ramStartAddr (void*)0x800EE1C0
@@ -91,6 +98,7 @@ extern int LZ4_decompress_safe(const char* source, char* dest, int compressedSiz
 extern int LZ4_compress_fast(const char* src, char* dest, int srcSize, int dstCapacity, int acceleration);
 extern int LZ4_compress_default(const char* src, char* dst, int srcSize, int dstCapacity);
 
+extern void colorText(s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 typedef char *outfun(char*,const char*,unsigned int);
 int _Printf(outfun prout, char *arg, const char *fmt, va_list args);
 void crash_screen_init(void);

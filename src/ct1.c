@@ -12,6 +12,7 @@ extern void* crash_screen_copy_to_buf(void* dest, const char* src, u32 size);
 #define LOAD_MODE 1
 
 s32 controllerData = 0x80175650;
+u8 menuIsActive = 0;
 
 typedef struct CustomThread {
     /* 0x000 */ OSThread thread;
@@ -39,7 +40,7 @@ int __osPiDeviceBusy() {
 void _sprintf(void* destination, void* fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    _Printf((void*)crash_screen_copy_to_buf, (void*)&textBuffer, fmt, args);
+    _Printf((void*)crash_screen_copy_to_buf, destination, fmt, args);
     va_end(args);
 }
 
@@ -375,64 +376,76 @@ void printPausePractice(void) {
 }
 
 void testFuncPointer(void);
+void pageMainDisplay(s32, s32);
 
 void mainCFunction(void) {
 
     // Max out player 1 health
     p1Health = 0x0A;
-    testFuncPointer();
+    //testFuncPointer();
 
-    //readInputsWrapper();
-    //printCustomDebugText();
-    updateCustomInputTracking();
-    printPausePractice();
-    //print_fps();
+    pageMainDisplay(currPageNo, currOptionNo);
 
-    blackWhiteUnlock = 0x0C;
+    // Some Button
+    if (menuIsActive == 1) {
+        //pageMainDisplay(currPageNo, currOptionNo);
+        //updateMenuInput();
+    }
+    else {
+        //readInputsWrapper();
+        //printCustomDebugText();
+        updateCustomInputTracking();
+        printPausePractice();
+        //print_fps();
 
-	//debugBool = 1;
-	currentFileLevelUnlocks = 0xFF; //unlock all levels
-    currentFileLevelUnlocks2 = 0xFF; //unlock all levels
+        blackWhiteUnlock = 0x0C;
 
-    if (stateCooldown == 0) {
-        if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_UP)) {
-            if (debugBool == 1) {
-                debugBool = 0;
-            } else if (debugBool == 0) {
-                debugBool = 1;
+	    //debugBool = 1;
+	    currentFileLevelUnlocks = 0xFF; //unlock all levels
+        currentFileLevelUnlocks2 = 0xFF; //unlock all levels
+
+        if (stateCooldown == 0) {
+            if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_UP)) {
+                if (debugBool == 1) {
+                    debugBool = 0;
+                } else if (debugBool == 0) {
+                    debugBool = 1;
+                } else {
+                    //if -1
+                    debugBool = 0;
+                }
+            } else if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_DOWN)) {
+                stateModeDisplay ^= 1;
+                //teleportToStageBoss();    // Using L+D_DOWN as test func
+            } else if (currentlyPressedButtons & DPAD_DOWN) {
+                saveOrLoadStateMode ^= 1;
             } else {
-                //if -1
-                debugBool = 0;
+                checkInputsForSavestates();
             }
-        } else if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_DOWN)) {
-            stateModeDisplay ^= 1;
-            //teleportToStageBoss();    // Using L+D_DOWN as test func
-        } else if (currentlyPressedButtons & DPAD_DOWN) {
-            saveOrLoadStateMode ^= 1;
-        } else {
-            checkInputsForSavestates();
+        }
+
+        if (stateCooldown > 0) {
+            stateCooldown--;
+        }
+
+        if (stateModeDisplay == 1) {
+            if (saveOrLoadStateMode == SAVE_MODE) {
+                textBuffer2[0] =  0xA3;
+                textBuffer2[1] = 0x60 + 's';
+            } else {
+                textBuffer2[0] = 0xA3;
+                textBuffer2[1] = 0x60 + 'l';
+            }
+            textBuffer2[2] = 0;
+
+            //textPrint(13.0f, 208.0f, 0.65f, &textBuffer2, 3);
+            if (gameMode == GAME_MODE_OVERWORLD){
+                if (isPaused == 0) {
+                    //drawTimer();
+                }
+            }
         }
     }
 
-    if (stateCooldown > 0) {
-        stateCooldown--;
-    }
-
-    if (stateModeDisplay == 1) {
-        if (saveOrLoadStateMode == SAVE_MODE) {
-            textBuffer2[0] =  0xA3;
-            textBuffer2[1] = 0x60 + 's';
-        } else {
-            textBuffer2[0] = 0xA3;
-            textBuffer2[1] = 0x60 + 'l';
-        }
-        textBuffer2[2] = 0;
-
-        textPrint(13.0f, 208.0f, 0.65f, &textBuffer2, 3);
-        if (gameMode == GAME_MODE_OVERWORLD){
-        if (isPaused == 0) {
-            drawTimer();
-        }
-    }
-    }
+    
 }

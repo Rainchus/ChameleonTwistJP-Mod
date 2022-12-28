@@ -13,6 +13,7 @@
 .definelabel blackWhiteUnlock, 0x80200C01
 
 // Funcs //
+.definelabel colorText, 0x80061308
 
 .definelabel gameMode, 0x800FFEB4
 .definelabel subGameMode, 0x800FFEB8

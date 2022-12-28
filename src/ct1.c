@@ -310,7 +310,7 @@ s32 teleportToStageBoss(void) {
     return 1;
 }
 
-void givePlayerMaxCrowns(void) {
+s32 givePlayerMaxCrowns(void) {
     // Gives Player Max Crowns
     if (gameMode == GAME_MODE_OVERWORLD) {
         jlCrowns = 25;
@@ -320,6 +320,7 @@ void givePlayerMaxCrowns(void) {
         dcCrowns = 24;
         gcCrowns = 23;
     }
+    return 1;
 }
 
 void printPausePractice(void) {
@@ -394,7 +395,7 @@ void mainCFunction(void) {
             stateCooldown--;
         }
 
-        if (stateModeDisplay == 1) {
+        if (toggles[TOGGLE_HIDE_SAVESTATE_TEXT] == 1) {
             if (saveOrLoadStateMode == SAVE_MODE) {
                 textBuffer2[0] =  0xA3;
                 textBuffer2[1] = 0x60 + 's';
@@ -403,8 +404,10 @@ void mainCFunction(void) {
                 textBuffer2[1] = 0x60 + 'l';
             }
             textBuffer2[2] = 0;
+            textPrint(13.0f, 208.0f, 0.65f, &textBuffer2, 3);
+        }
 
-            //textPrint(13.0f, 208.0f, 0.65f, &textBuffer2, 3);
+        if (toggles[TOGGLE_HIDE_IGT] == 1) {
             if (gameMode == GAME_MODE_OVERWORLD){
                 if (isPaused == 0) {
                     drawTimer();

@@ -12,13 +12,18 @@ typedef s32 (*menuProc) (void);
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
 
 u8 toggles[] = {
-    0, // TOGGLE_HIDE_TEXT
+    1, // TOGGLE_HIDE_IGT
+    1, // TOGGLE_HIDE_SAVESTATE_TEXT
     0  // TOGGLE_INFINITE_HEALTH
 };
 
-s32 toggleHideText(void) {
-    toggles[TOGGLE_HIDE_TEXT] ^= 1;
-    stateModeDisplay ^= 1;
+s32 toggleHideSavestateText(void) {
+    toggles[TOGGLE_HIDE_SAVESTATE_TEXT] ^= 1;
+    return 1;
+}
+
+s32 toggleHideIGT(void) {
+    toggles[TOGGLE_HIDE_IGT] ^= 1;
     return 1;
 }
 
@@ -35,48 +40,36 @@ typedef struct menuPage {
 } menuPage;
 
 menuPage page1 = {
-    .optionCount = 2,
-    .pageIndex = PAGE_JL,
-    .options = {
-        "Toggle Hide Text\n",
-        "Infinite Health\n"
-    },
-    .menuProc = {
-        &toggleHideText,
-        &toggleInfiniteHealth
-    }
-};
-
-menuPage page0 = {
     .optionCount = 3,
     .pageIndex = PAGE_MAIN,
     .options = {
         "Load Boss\n",
-        "Page0 Option1\n",
-        "Page0 Option2\n",
+        "Infinite Health\n",
+        "Have All Crowns\n",
     },
     .menuProc = {
         &teleportToStageBoss,
-        &teleportToStageBoss,
-        &teleportToStageBoss
+        &toggleInfiniteHealth,
+        &givePlayerMaxCrowns
+    }
+};
+
+menuPage page0 = {
+    .optionCount = 2,
+    .pageIndex = PAGE_JL,
+    .options = {
+        "Toggle Hide Savestate Text\n",
+        "Toggle Hide IGT\n",
+    },
+    .menuProc = {
+        &toggleHideSavestateText,
+        &toggleHideIGT
     }
 };
 
 menuPage* pageList[] = {
     &page0,
     &page1
-};
-
-enum MenuOptions {
-    MENU_OPTION_LOAD_BOSS = 0,
-    MENU_OPTION_TEST = 1,
-    MENU_OPTION_TEST2 = 2,
-    MENU_OPTION_TEST3 = 3,
-    MENU_OPTION_TEST4 = 4,
-    MENU_OPTION_TEST5 = 5,
-    MENU_OPTION_TEST6 = 6,
-    MENU_OPTION_TEST7 = 7,
-    MENU_OPTION_TEST8 = 8
 };
 
 //testing func ptr
@@ -87,14 +80,14 @@ void colorTextWrapper(s32* color) {
              color[8], color[9], color[10], color[11], color[12], color[13], color[14], color[15]);
 }
 
-s32 colorTest[] = {
+s32 menuHoveredTextColor[] = {
     0x0A, 0xFF, 0x00, 0xFF, // top
     0xFF, 0xFF, 0xFF, 0xFF, // bottom
     0x0A, 0xFF, 0x00, 0xFF, // top
     0xFF, 0xFF, 0x00, 0x0F  // bottom
 };
 
-s32 currPageNo = 1;
+s32 currPageNo = 0;
 s32 currOptionNo = 0;
 
 char menuOptionBuffer[50] = { 0 };  // Buffer for menu options text
@@ -145,14 +138,12 @@ void pageMainDisplay(s32 currPageNo, s32 currOptionNo) {
         convertAsciiToText(&menuOptionBufferConverted, (char*)&menuOptionBuffer);
 
         if (i == currOptionNo) {
-            colorTextWrapper(colorTest);
+            colorTextWrapper(menuHoveredTextColor);
         }
 
         textPrint(xPos, (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);
     }
 }
-
-// Boolean Menu Options (Toggles)
 
 
 

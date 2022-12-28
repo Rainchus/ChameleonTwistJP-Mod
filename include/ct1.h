@@ -23,8 +23,9 @@ extern u8 menuIsActive;
 extern u8 toggles[];
 
 enum Toggles {
-    TOGGLE_HIDE_TEXT = 0,
-    TOGGLE_INFINITE_HEALTH = 1
+    TOGGLE_HIDE_SAVESTATE_TEXT,
+    TOGGLE_HIDE_IGT,
+    TOGGLE_INFINITE_HEALTH
 };
 
 extern void updateMenuInput(void);
@@ -89,7 +90,7 @@ extern s8 dcCrowns;
 extern s8 gcCrowns;
 extern u8 blackWhiteUnlock;         // Flag (0x0C)
 
-void givePlayerMaxCrowns(void);
+s32 givePlayerMaxCrowns(void);
 // End All Unlocks //
 
 // SFX // 

@@ -251,7 +251,7 @@ void checkInputsForSavestates(void) {
     }
 }
 
-void printCustomDebugText(void) {
+s32 printCustomDebugText(void) {
     f32 xPos = 20.0f;
     f32 yPos = 35.0f;
     f32 scale = 0.5f;
@@ -301,6 +301,7 @@ void printCustomDebugText(void) {
 		convertAsciiToText(&textBuffer2, (char*)&textBuffer);
 		printText(xPos, yPos, 0, scale, 0, 0, &textBuffer2, style);
 	}
+    return 0;
 }
 
 extern s32		osContStartReadData(OSMesgQueue *);
@@ -340,7 +341,6 @@ void givePlayerMaxCrowns(void) {
 
 //80168DA8
 
-
 void printPausePractice(void) {
     f32 xPos = 20.0f;
     f32 yPos = 35.0f;
@@ -374,10 +374,13 @@ void printPausePractice(void) {
     }
 }
 
+void testFuncPointer(void);
+
 void mainCFunction(void) {
 
     // Max out player 1 health
     p1Health = 0x0A;
+    testFuncPointer();
 
     //readInputsWrapper();
     //printCustomDebugText();

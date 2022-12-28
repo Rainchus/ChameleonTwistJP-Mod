@@ -37,6 +37,10 @@ all:
 	@mips64-elf-gcc -Wall $(OPTFLAGS) -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/lib.c
 	@mv lib.o obj/
 
+	@$(PRINT)$(GREEN)Compiling C file: $(ENDGREEN)$(BLUE)menu.c$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
+	@mips64-elf-gcc -Wall $(OPTFLAGS) -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/menu.c
+	@mv menu.o obj/
+
 	@$(PRINT)$(GREEN)armips $(ENDGREEN)$(BLUE)asm/main.asm$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
 	@armips asm/main.asm
 

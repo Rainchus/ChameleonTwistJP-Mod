@@ -259,45 +259,47 @@ void printCustomDebugText(void) {
 
 	if (printTextBool == 1) {
 		if (P1Instance != NULL) {
-			//_sprintf(textBuffer, "XPos: %.4f\n", p1.xPos);
-			//_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			//convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-            //textPrint(xPos, yPos, scale, &textBuffer2, style);
+			// yPos += 10.0f;
+			// _sprintf(textBuffer, "XPos: %.4f\n", p1.xPos);
+			// _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			// convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			// printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
 
-			//yPos += 10.0f;
+			// yPos += 10.0f;
 
-			//_sprintf(textBuffer, "YPos: %.4f\n", p1.yPos);
-			//_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			//convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			//textPrint(xPos, yPos, scale, &textBuffer2, style);
+			// _sprintf(textBuffer, "YPos: %.4f\n", p1.yPos);
+			// _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			// convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			// printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
 
-			//yPos += 10.0f;
+			// yPos += 10.0f;
 
-			//_sprintf(textBuffer, "ZPos: %.4f\n", p1.zPos);
-			//_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			//convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			//textPrint(xPos, yPos, scale, &textBuffer2, style);
+			// _sprintf(textBuffer, "ZPos: %.4f\n", p1.zPos);
+			// _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			// convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			// printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
 
-			//yPos += 10.0f;
+			// yPos += 10.0f;
 
-			//_sprintf(textBuffer, "ANGL: %.4f\n", p1.yAngle);
-			//_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			//convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			//textPrint(xPos, yPos, scale, &textBuffer2, style);
+			// _sprintf(textBuffer, "ANGL: %.4f\n", p1.yAngle);
+			// _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			// convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			// printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
 
-			//yPos += 10.0f;
+			// yPos += 10.0f;
 
-			//_sprintf(textBuffer, "VAUL: %02d\n", tongue.vaultTime);
-			//_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			//convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			//textPrint(xPos, yPos, scale, &textBuffer2, style);
+			// _sprintf(textBuffer, "VAUL: %02d\n", tongue.vaultTime);
+			// _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			// convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			// printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
 
 			yPos += 10.0f;
 		}
+        
         _sprintf(textBuffer, "RNG: %08X\n", rngSeed);
 		_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
 		convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-		printText(xPos, yPos, 0, scale, 0, 0, &textBuffer2, style);
+		printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
 	}
 }
 

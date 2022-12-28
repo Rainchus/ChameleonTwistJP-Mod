@@ -106,10 +106,11 @@ s32 ct_strlen(char* string);
 void set_gp(void);
 // extern char compressBuffer[1024 * 1024];
 extern char decompressBuffer[0x803B5000 - 0x800EE1C0];
-
 extern s32 isTakingLoadingZone;
 extern s32 pauseFrameCount;
 
+extern s32 isTakingLoadingZone;
+extern s32 pauseFrameCount;
 
 typedef u64	OSTime;
 #define	OS_CLOCK_RATE		62500000LL

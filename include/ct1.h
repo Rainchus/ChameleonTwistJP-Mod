@@ -11,6 +11,21 @@ extern s32 currPageNo;
 extern s32 currOptionNo;
 extern u8 menuIsActive;
 
+#define DPAD_UP 0x08000000
+#define DPAD_DOWN 0x04000000
+#define DPAD_LEFT 0x02000000
+#define DPAD_RIGHT 0x01000000
+#define L_BUTTON 0x00200000
+#define BUTTON_B 0x40000000
+#define BUTTON_A 0x80000000
+
+extern u8 toggles[];
+
+enum Toggles {
+    TOGGLE_HIDE_TEXT = 0,
+    TOGGLE_INFINITE_HEALTH = 1
+};
+
 extern void updateMenuInput(void);
 
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))

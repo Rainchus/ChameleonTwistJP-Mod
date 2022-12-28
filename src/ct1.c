@@ -2,12 +2,6 @@
 
 extern void* crash_screen_copy_to_buf(void* dest, const char* src, u32 size);
 
-#define DPAD_UP 0x08000000
-#define DPAD_DOWN 0x04000000
-#define DPAD_LEFT 0x02000000
-#define DPAD_RIGHT 0x01000000
-#define L_BUTTON 0x00200000
-
 #define SAVE_MODE 0
 #define LOAD_MODE 1
 
@@ -308,24 +302,12 @@ s32 printCustomDebugText(void) {
 extern s32		osContStartReadData(OSMesgQueue *);
 extern void osContGetReadData(OSContPad *);
 
-// s32 readInputsWrapper(void) {
-//     OSContPad unkPtr;
-//     osContStartReadData(&unkPtr);
-//     osRecvMesg(&unkPtr, 0, 1);
-//     osContGetReadData(&unkPtr);
-//     osRecvMesg(&unkPtr, 0, 1);
-//     OSContPad* p1Pad = (u8*)0x80175650;
-//     p1Pad->button = unkPtr.button;
-//     p1Pad->stick_x = unkPtr.stick_x;
-//     p1Pad->stick_y = unkPtr.stick_y;
-//     return &unkPtr;
-// }
-
-void teleportToStageBoss(void) {
+s32 teleportToStageBoss(void) {
     // Teleports Player to Current World's Boss Stage
     if ((gameMode == GAME_MODE_OVERWORLD) && (currLevel < 0x06)) {
         loadBoss();
     }
+    return 1;
 }
 
 void givePlayerMaxCrowns(void) {
@@ -339,8 +321,6 @@ void givePlayerMaxCrowns(void) {
         gcCrowns = 23;
     }
 }
-
-//80168DA8
 
 void printPausePractice(void) {
     f32 xPos = 20.0f;
@@ -377,46 +357,33 @@ void printPausePractice(void) {
 
 void testFuncPointer(void);
 void pageMainDisplay(s32, s32);
+extern s32 isMenuActive;
 
 void mainCFunction(void) {
+    if (debugBool == -1) {
+        debugBool = 0;
+    }
 
     // Max out player 1 health
-    p1Health = 0x0A;
-    //testFuncPointer();
-
-    pageMainDisplay(currPageNo, currOptionNo);
+    if (toggles[TOGGLE_INFINITE_HEALTH] == 1) {p1Health = 0x0A;}
+    updateCustomInputTracking();
+    blackWhiteUnlock = 0x0C;
+	currentFileLevelUnlocks = 0xFF; //unlock all levels
+    currentFileLevelUnlocks2 = 0xFF; //unlock all levels
 
     // Some Button
-    if (menuIsActive == 1) {
-        //pageMainDisplay(currPageNo, currOptionNo);
-        //updateMenuInput();
+    if (isMenuActive == 1) {
+        pageMainDisplay(currPageNo, currOptionNo);
+        updateMenuInput();
     }
     else {
-        //readInputsWrapper();
-        //printCustomDebugText();
-        updateCustomInputTracking();
         printPausePractice();
-        //print_fps();
-
-        blackWhiteUnlock = 0x0C;
-
-	    //debugBool = 1;
-	    currentFileLevelUnlocks = 0xFF; //unlock all levels
-        currentFileLevelUnlocks2 = 0xFF; //unlock all levels
 
         if (stateCooldown == 0) {
             if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_UP)) {
-                if (debugBool == 1) {
-                    debugBool = 0;
-                } else if (debugBool == 0) {
-                    debugBool = 1;
-                } else {
-                    //if -1
-                    debugBool = 0;
-                }
+                debugBool ^= 1;
             } else if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_DOWN)) {
-                stateModeDisplay ^= 1;
-                //teleportToStageBoss();    // Using L+D_DOWN as test func
+                isMenuActive ^= 1;
             } else if (currentlyPressedButtons & DPAD_DOWN) {
                 saveOrLoadStateMode ^= 1;
             } else {
@@ -441,10 +408,11 @@ void mainCFunction(void) {
             //textPrint(13.0f, 208.0f, 0.65f, &textBuffer2, 3);
             if (gameMode == GAME_MODE_OVERWORLD){
                 if (isPaused == 0) {
-                    //drawTimer();
+                    drawTimer();
                 }
             }
         }
+        
     }
 
     

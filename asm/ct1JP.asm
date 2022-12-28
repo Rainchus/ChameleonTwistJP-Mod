@@ -15,6 +15,7 @@
 // Funcs //
 .definelabel colorText, 0x80061308
 
+
 .definelabel gameMode, 0x800FFEB4
 .definelabel subGameMode, 0x800FFEB8
 .definelabel dma_copy, 0x80085C20
@@ -45,7 +46,7 @@
 .definelabel __osSpDeviceBusy, 0x800E6800
 .definelabel __osSiDeviceBusy, 0x800EBBE0
 
-.definelabel stateCooldown, 0x8047FFF8
+
 //.definelabel stateFinishedBool, 0x8047FFFC
 .definelabel gCrashScreen, 0x80400100
 .definelabel gCustomThread, 0x80400200
@@ -81,6 +82,8 @@
 .definelabel textBuffer2, 0x807F0200
 
 .definelabel heldButtonsMain, 0x80175650
+.definelabel stateCooldown, 0x807FFFC4
+//0x807FFFC8 taken by temp var
 .definelabel pauseFrameCountMode, 0x807FFFCC
 .definelabel pauseFrameCount, 0x807FFFD0
 .definelabel stateModeDisplay, 0x807FFFD4

@@ -8,19 +8,42 @@ enum Pages {
 #define FUNCS_PER_PAGE 8
 #define FUNCS_PER_LAST_PAGE 3
 
+typedef s32 (*menuProc) (void);
+#define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
+
+u8 toggles[] = {
+    0, // TOGGLE_HIDE_TEXT
+    0  // TOGGLE_INFINITE_HEALTH
+};
+
+s32 toggleHideText(void) {
+    toggles[TOGGLE_HIDE_TEXT] ^= 1;
+    stateModeDisplay ^= 1;
+    return 1;
+}
+
+s32 toggleInfiniteHealth(void) {
+    toggles[TOGGLE_INFINITE_HEALTH] ^= 1;
+    return 1;
+}
+
 typedef struct menuPage {
     /* 0x08 */ s32 optionCount;
     /* 0x0C */ s32 pageIndex;
     /* 0x10 */ char* options[FUNCS_PER_PAGE];
-    /* 0x30 */ void* functions[FUNCS_PER_PAGE];
+    /* 0x30 */ s32 (*menuProc[FUNCS_PER_PAGE]) (void);
 } menuPage;
 
 menuPage page1 = {
     .optionCount = 2,
     .pageIndex = PAGE_JL,
     .options = {
-        "p10\n",
-        "p11\n"
+        "Toggle Hide Text\n",
+        "Infinite Health\n"
+    },
+    .menuProc = {
+        &toggleHideText,
+        &toggleInfiniteHealth
     }
 };
 
@@ -31,6 +54,11 @@ menuPage page0 = {
         "Load Boss\n",
         "Page0 Option1\n",
         "Page0 Option2\n",
+    },
+    .menuProc = {
+        &teleportToStageBoss,
+        &teleportToStageBoss,
+        &teleportToStageBoss
     }
 };
 
@@ -38,8 +66,6 @@ menuPage* pageList[] = {
     &page0,
     &page1
 };
-
-#define PAGE_TOTAL sizeof(pageList) / sizeof(pageList[0]);
 
 enum MenuOptions {
     MENU_OPTION_LOAD_BOSS = 0,
@@ -62,51 +88,52 @@ void colorTextWrapper(s32* color) {
 }
 
 s32 colorTest[] = {
-    0xFF, 0xFF, 0xFF, 0xFF, // top
-    0x00, 0x00, 0x00, 0x00, // bottom
-    0xFF, 0xFF, 0xFF, 0xFF, // top
-    0x00, 0x00, 0x00, 0x00  // bottom
+    0x0A, 0xFF, 0x00, 0xFF, // top
+    0xFF, 0xFF, 0xFF, 0xFF, // bottom
+    0x0A, 0xFF, 0x00, 0xFF, // top
+    0xFF, 0xFF, 0x00, 0x0F  // bottom
 };
 
-typedef s32 (*menuProc) (void);
 s32 currPageNo = 1;
 s32 currOptionNo = 0;
 
 char menuOptionBuffer[50] = { 0 };  // Buffer for menu options text
 char menuOptionBufferConverted[100] = { 0 };  // Buffer for menu options text converted to chameleon twist format
 
-//void updateMenuInput(void){
-//    if (currentlyPressedButtons & BUTTON_DPAD_UP) {
-//        if (currOptionNo > 0) {
-//            currOptionNo--;
-//        }
-//    }
-//    else if (currentlyPressedButtons & BUTTON_DPAD_DOWN) {
-//        if (currOptionNo < pageList[currPageNo]->optionCount) {
-//            currOptionNo++;
-//        }
-//    }
-//    else if (currentlyPressedButtons & BUTTON_DPAD_LEFT) {
-//        if (currPageNo > 0) {
-//            currPageNo--;
-//        }
-//    }
-//    else if (currentlyPressedButtons & BUTTON_DPAD_RIGHT) {
-//        if (currPageNo < PAGE_TOTAL) {
-//            currPageNo++;
-//        }
-//    }
-//    else if (currentlyPressedButtons & BUTTON_B) {
-//        menuIsActive = 0;
-//    }
-//    else if (currentlyPressedButtons & BUTTON_A) {
-//        menuIsActive = 0;
-//    }
-//}
+s32 isMenuActive = 0;
+
+void updateMenuInput(void){
+    if (currentlyPressedButtons & DPAD_UP) {
+        if (currOptionNo > 0) {
+            currOptionNo--;
+        }
+    }
+    else if (currentlyPressedButtons & DPAD_DOWN) {
+        if (currOptionNo < pageList[currPageNo]->optionCount - 1) {
+            currOptionNo++;
+        }
+    }
+    else if (currentlyPressedButtons & DPAD_LEFT) {
+        if (currPageNo > 0) {
+            currPageNo--;
+        }
+    }
+    else if (currentlyPressedButtons & DPAD_RIGHT) {
+        if (currPageNo < ARRAY_COUNT(pageList) - 1) {
+            currPageNo++;
+        }
+    }
+    else if (currentlyPressedButtons & BUTTON_B) {
+        isMenuActive = 0;
+    }
+    else if (currentlyPressedButtons & BUTTON_A) {
+        pageList[currPageNo]->menuProc[currOptionNo]();
+    }
+}
 
 void pageMainDisplay(s32 currPageNo, s32 currOptionNo) {
     f32 xPos = 20.0f;
-    f32 yPos = 10.0f;
+    f32 yPos = 30.0f;
     menuPage* currPage = pageList[currPageNo];
 
     for (int i = 0; i < currPage->optionCount; i++) {
@@ -114,8 +141,10 @@ void pageMainDisplay(s32 currPageNo, s32 currOptionNo) {
         _sprintf(menuOptionBuffer, "%s", currPage->options[i]);
         _bzero(&menuOptionBufferConverted, sizeof(menuOptionBufferConverted)); //clear buffer 2
         convertAsciiToText(&menuOptionBufferConverted, (char*)&menuOptionBuffer);
-        colorTextWrapper(colorTest);
-        textPrint(xPos, (yPos + (i * 30.0f)), 0.5f, &menuOptionBufferConverted, 1);
+        if (i == currOptionNo) {
+            colorTextWrapper(colorTest);
+        }
+        textPrint(xPos, (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);
     }
 }
 
@@ -144,7 +173,7 @@ void pageMainDisplay(s32 currPageNo, s32 currOptionNo) {
 void testFuncPointer(void) {
     // menuProc temp = &printCustomDebugText;
     // (*temp)();
-    //pageMainDisplay(0, 0);
+    // pageMainDisplay(0, 0);
 }
 
 // typedef struct menuOptionProc {
@@ -152,11 +181,6 @@ void testFuncPointer(void) {
 // } menuOptionProc;
 
 // Boolean Menu Options (Toggles)
-#define TOGGLE_COUNT 1  // Needs to be updated when new toggle is added
-u8 toggles[TOGGLE_COUNT];
 
-enum Toggles {
-    TOGGLE_HIDE_TEXT = 0
-};
 
 

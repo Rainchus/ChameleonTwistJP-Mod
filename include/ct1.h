@@ -22,6 +22,8 @@ extern u8 menuIsActive;
 
 extern u8 toggles[];
 extern s32 textWhiteColor[];
+extern s32 menuHoveredTextColor[];
+extern s32 textRedColor[];
 
 enum Toggles {
     TOGGLE_HIDE_SAVESTATE_TEXT,
@@ -87,6 +89,7 @@ extern s32 freeCamActive; //0 fixed cam, 1 free cam
 extern s32 isPaused;
 extern s32 pauseFrameCountMode;
 extern s8 currLevel;
+extern s32 currRoom;
 
 // All Unlocks //
 extern u8 currentFileLevelUnlocks;  // Flag

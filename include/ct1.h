@@ -16,8 +16,9 @@ extern u8 menuIsActive;
 #define DPAD_LEFT 0x02000000
 #define DPAD_RIGHT 0x01000000
 #define L_BUTTON 0x00200000
-#define BUTTON_B 0x40000000
-#define BUTTON_A 0x80000000
+#define R_BUTTON 0x00100000
+#define B_BUTTON 0x40000000
+#define A_BUTTON 0x80000000
 
 extern u8 toggles[];
 

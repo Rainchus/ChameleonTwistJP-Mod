@@ -355,7 +355,6 @@ void printPausePractice(void) {
     }
 }
 
-void testFuncPointer(void);
 void pageMainDisplay(s32, s32);
 extern s32 isMenuActive;
 
@@ -380,9 +379,9 @@ void mainCFunction(void) {
         printPausePractice();
 
         if (stateCooldown == 0) {
-            if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_UP)) {
+            if ((heldButtonsMain & R_BUTTON) && (currentlyPressedButtons & DPAD_UP)) {
                 debugBool ^= 1;
-            } else if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_DOWN)) {
+            } else if ((heldButtonsMain & R_BUTTON) && (currentlyPressedButtons & DPAD_DOWN)) {
                 isMenuActive ^= 1;
             } else if (currentlyPressedButtons & DPAD_DOWN) {
                 saveOrLoadStateMode ^= 1;

@@ -116,17 +116,19 @@ void updateMenuInput(void){
     else if (currentlyPressedButtons & DPAD_LEFT) {
         if (currPageNo > 0) {
             currPageNo--;
+            currOptionNo = 0;
         }
     }
     else if (currentlyPressedButtons & DPAD_RIGHT) {
         if (currPageNo < ARRAY_COUNT(pageList) - 1) {
             currPageNo++;
+            currOptionNo = 0;
         }
     }
-    else if (currentlyPressedButtons & BUTTON_B) {
+    else if (currentlyPressedButtons & B_BUTTON) {
         isMenuActive = 0;
     }
-    else if (currentlyPressedButtons & BUTTON_A) {
+    else if (currentlyPressedButtons & A_BUTTON) {
         pageList[currPageNo]->menuProc[currOptionNo]();
     }
 }
@@ -141,44 +143,14 @@ void pageMainDisplay(s32 currPageNo, s32 currOptionNo) {
         _sprintf(menuOptionBuffer, "%s", currPage->options[i]);
         _bzero(&menuOptionBufferConverted, sizeof(menuOptionBufferConverted)); //clear buffer 2
         convertAsciiToText(&menuOptionBufferConverted, (char*)&menuOptionBuffer);
+
         if (i == currOptionNo) {
             colorTextWrapper(colorTest);
         }
+
         textPrint(xPos, (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);
     }
 }
-
-// s32 menuDisplay(void) {
-//     switch (currPageNo) {
-//         case PAGE_NONE:
-//             break;
-//         case PAGE_MAIN:
-//             //pageMainDisplay();
-//             break;
-//     }
-//     return 1;
-// }
-
-// s32 menuProcFunc(void) {
-//     switch (currPageNo) {
-//         case PAGE_NONE:
-//             break;
-//         case PAGE_MAIN:
-
-//             break;
-//     }
-//     return 1;
-// }
-
-void testFuncPointer(void) {
-    // menuProc temp = &printCustomDebugText;
-    // (*temp)();
-    // pageMainDisplay(0, 0);
-}
-
-// typedef struct menuOptionProc {
-//     /* 0x00 */ s32 
-// } menuOptionProc;
 
 // Boolean Menu Options (Toggles)
 

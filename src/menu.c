@@ -132,10 +132,10 @@ void updateMenuInput(void){
 }
 
 void pageMainDisplay(s32 currPageNo, s32 currOptionNo) {
-    f32 xPos = 20.0f;
-    f32 yPos = 30.0f;
     menuPage* currPage = pageList[currPageNo];
-
+    f32 xPos = 20.0f;
+    f32 yPos = 35.0f;
+    
     for (int i = 0; i < currPage->optionCount; i++) {
         _bzero(&menuOptionBuffer, sizeof(menuOptionBuffer)); //clear buffer
         _sprintf(menuOptionBuffer, "%s", currPage->options[i]);

@@ -1,19 +1,35 @@
-# ChameleonTwistJP-Mod
+# PracTwist v0.2.1
 
-A basic mod for JP chameleon twist that adds 3 savestate slots and the crash screen from Paper Mario</br>
-Also included is a toggle for the in game debug mode that exist</br>
+A speedrun practice mod for the JP chameleon twist rom that adds save states; a crash screen and an in game timer.
+Also included is a toggle for the in game debug mode that exists.</br>
+
+### Version 0.2.1 Notes:
+- Maxed Player Health
+- Added Function to Max Crown Count
+- Default Unlocked Boss Rush Mode
+- Added White and Black Chameleons as Playable
+
+### Planned Features:
+- A menu to allow for easier control and less hotkey confusion
+- A setting to refresh the room the player is currently in
+    - This will allow the user to choose cycle timings to practice
+- A mode to highlight collision of objects
+
+# How to patch
+Take a vanilla chameleon twist 1 jp rom in `.z64 format` and patch it using the `.bps` file at this site https://hack64.net/tools/patcher.php</br></br>
+If you rom isn't `.z64` format, this site can swap it to that format https://hack64.net/tools/swapper.php
 
 # How to patch
 Take a vanilla chameleon twist 1 jp rom in `.z64 format` and patch it using the `.bps` file at this site https://hack64.net/tools/patcher.php</br></br>
 If you rom isn't `.z64` format, this site can swap it to that format https://hack64.net/tools/swapper.php
 
 # Controls
-Dpad-left access savestate slot 1</br>
-Dpad-up access savestate slot 2</br>
-Dpad-right access savestate slot 3</br>
-Dpad-down toggle between `save` and `load` mode</br>
-Holding L and pressing dpad-up will toggle the in game debug mode</br>
-Holding L and pressing dpad-down will toggle the printing of the `S` or `L` for the save/load mode</br>
+`Dpad-left` access savestate slot 1</br>
+`Dpad-up` access savestate slot 2</br>
+`Dpad-right` access savestate slot 3</br>
+`Dpad-down` toggle between `save` and `load` mode</br>
+`Holding L` and pressing `dpad-up` will toggle the in game debug mode</br>
+`Holding L` and pressing `dpad-down` will toggle the printing of mod text and timers</br>
 
 # Usage
 The savestates have a saving and loading mode. To toggle between them, use `dpad-down`</br>

@@ -21,6 +21,10 @@ all:
 	@mips64-elf-gcc -Wall $(OPTFLAGS) -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/crash.c
 	@mv crash.o obj/
 
+	@$(PRINT)$(GREEN)Compiling C file: $(ENDGREEN)$(BLUE)print.c$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
+	@mips64-elf-gcc -Wall $(OPTFLAGS) -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/print.c
+	@mv print.o obj/
+
 	@$(PRINT)$(GREEN)Compiling C file: $(ENDGREEN)$(BLUE)ct1.c$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
 	@mips64-elf-gcc -Wall $(OPTFLAGS) -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/ct1.c
 	@mv ct1.o obj/

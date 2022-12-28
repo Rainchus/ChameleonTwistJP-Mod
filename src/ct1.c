@@ -90,10 +90,7 @@ f32 calculate_and_update_fps(void) {
 void print_fps(void) {
     f32 xPos = 20.0f;
     f32 yPos = 220.0f;
-    s32 arga2 = 0.0f;
     f32 scale = 0.5f;
-    f32 arga4 = 0.0f;
-    f32 arga5 = 0.0f;
     s32 style = 3;
 
     f32 fps = calculate_and_update_fps();
@@ -102,7 +99,7 @@ void print_fps(void) {
 	_sprintf(textBuffer, "FPS: %2.2f", fps);
 	_bzero(&textBuffer2, sizeof(textBuffer2)); //clear buffer
 	convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-	printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+    textPrint(xPos, yPos, scale, &textBuffer2, style);
 }
 
 int cBootMain(void) {
@@ -257,10 +254,7 @@ void checkInputsForSavestates(void) {
 void printCustomDebugText(void) {
     f32 xPos = 20.0f;
     f32 yPos = 35.0f;
-    s32 arga2 = 0.0f;
     f32 scale = 0.5f;
-    f32 arga4 = 0.0f;
-    f32 arga5 = 0.0f;
     s32 style = 3;
 
 	if (printTextBool == 1) {
@@ -305,7 +299,7 @@ void printCustomDebugText(void) {
         _sprintf(textBuffer, "RNG: %08X\n", rngSeed);
 		_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
 		convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-		printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+		printText(xPos, yPos, 0, scale, 0, 0, &textBuffer2, style);
 	}
 }
 
@@ -324,6 +318,25 @@ extern void osContGetReadData(OSContPad *);
 //     p1Pad->stick_y = unkPtr.stick_y;
 //     return &unkPtr;
 // }
+
+void teleportToStageBoss(void) {
+    // Teleports Player to Current World's Boss Stage
+    if ((gameMode == GAME_MODE_OVERWORLD) && (currLevel < 0x06)) {
+        loadBoss();
+    }
+}
+
+void givePlayerMaxCrowns(void) {
+    // Gives Player Max Crowns
+    if (gameMode == GAME_MODE_OVERWORLD) {
+        jlCrowns = 25;
+        alCrowns = 25;
+        blCrowns = 21;
+        klCrowns = 23;
+        dcCrowns = 24;
+        gcCrowns = 23;
+    }
+}
 
 //80168DA8
 
@@ -363,14 +376,20 @@ void printPausePractice(void) {
 
 void mainCFunction(void) {
 
+    // Max out player 1 health
+    p1Health = 0x0A;
+
     //readInputsWrapper();
     //printCustomDebugText();
     updateCustomInputTracking();
     printPausePractice();
     //print_fps();
-	
+
+    blackWhiteUnlock = 0x0C;
+
 	//debugBool = 1;
-	currentFileLevelUnlocks = 0x13; //unlock all levels
+	currentFileLevelUnlocks = 0xFF; //unlock all levels
+    currentFileLevelUnlocks2 = 0xFF; //unlock all levels
 
     if (stateCooldown == 0) {
         if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_UP)) {
@@ -384,6 +403,7 @@ void mainCFunction(void) {
             }
         } else if ((heldButtonsMain & L_BUTTON) && (currentlyPressedButtons & DPAD_DOWN)) {
             stateModeDisplay ^= 1;
+            //teleportToStageBoss();    // Using L+D_DOWN as test func
         } else if (currentlyPressedButtons & DPAD_DOWN) {
             saveOrLoadStateMode ^= 1;
         } else {
@@ -405,6 +425,11 @@ void mainCFunction(void) {
         }
         textBuffer2[2] = 0;
 
-        printText(13.0f, 218.0f, 0.0f, 0.65f, 0.0f, 0.0f, &textBuffer2, 3);
+        textPrint(13.0f, 208.0f, 0.65f, &textBuffer2, 3);
+        if (gameMode == GAME_MODE_OVERWORLD){
+        if (isPaused == 0) {
+            drawTimer();
+        }
+    }
     }
 }

@@ -4,6 +4,8 @@
 #include "OS.h"
 #include "structs.h"
 
+#include "print.h"  // Custom Printing Functions
+
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
 #define ramStartAddr (void*)0x800EE1C0
 #define ramEndAddr (void*)0x803B5000
@@ -11,6 +13,7 @@
 #define MB *(1 <<20)
 #define GB *(1U<<30)
 
+// Controller and Inputs //
 typedef struct OSContPad {
     unsigned short 	button;     /* Controller button data */
     char  			stick_x;    /* Control stick's X coordinate position*/
@@ -18,28 +21,60 @@ typedef struct OSContPad {
     unsigned char  	errno;      /* Error values returned from the Controller */
 } OSContPad;
 
-extern volatile s32 saveOrLoadStateMode;
 extern s32 heldButtonsMain;
 extern s32 currentlyPressedButtons;
+extern s32 previouslyPressedButtons;
 extern s32 previouslyHeldButtons;
+// End Controller and Inputs //
+
+// Save States //
+extern volatile s32 saveOrLoadStateMode;
+extern volatile s32 savestateCurrentSlot;
 extern s32 savestate1Size;
 extern s32 savestate2Size;
 extern s32 savestate3Size;
 extern s32 savestate4Size;
-extern s32 previouslyPressedButtons;
-extern playerActor* P1Instance;
-extern Tongue* TongueInstance;
+extern s32 stateModeDisplay;
+// End Save States //
+
+// Player 1 //
 extern playerActor p1;
+extern s8 p1Health; 
+extern playerActor* P1Instance;
 extern Tongue tongue;
-extern u8 currentFileLevelUnlocks;
+extern Tongue* TongueInstance;
 extern s16 p1ButtonsHeld;
 extern s16 p1ButtonsPressed;
+// End Player 1 //
+
 extern u64 __osCurrentTime;
 extern u32 osMemSize;
 extern s32 freeCamActive; //0 fixed cam, 1 free cam
-extern s32 stateModeDisplay;
+
 extern s32 isPaused;
 extern s32 pauseFrameCountMode;
+extern s8 currLevel;
+
+// All Unlocks //
+extern u8 currentFileLevelUnlocks;  // Flag
+extern u8 currentFileLevelUnlocks2; // Flag
+extern s8 jlCrowns;
+extern s8 alCrowns;
+extern s8 blCrowns;
+extern s8 klCrowns;
+extern s8 dcCrowns;
+extern s8 gcCrowns;
+extern u8 blackWhiteUnlock;         // Flag (0x0C)
+
+void givePlayerMaxCrowns(void);
+// End All Unlocks //
+
+// SFX // 
+void playSound(s32, void*, s32);
+// End SFX //
+
+extern void drawTimer(void);
+extern void loadBoss(void);
 
 extern int getStatusRegister(void); //returns status reg
 extern int setStatusRegister(s32); //returns status reg
@@ -74,13 +109,14 @@ extern char decompressBuffer[0x803B5000 - 0x800EE1C0];
 extern s32 isTakingLoadingZone;
 extern s32 pauseFrameCount;
 
-void playSound(s32, void*, s32);
+extern s32 isTakingLoadingZone;
+extern s32 pauseFrameCount;
 
 typedef u64	OSTime;
 #define	OS_CLOCK_RATE		62500000LL
 #define	OS_CPU_COUNTER		(OS_CLOCK_RATE*3/4) // 46875000
 #define OS_CYCLES_TO_USEC(c)	(((u64)(c)*(1000000LL/15625LL))/(OS_CPU_COUNTER/15625LL))
-extern u32		osGetCount(void);
+extern OSTime		osGetCount(void);
 
 void osInvalICache(void*, s32);
 void osInvalDCache(void*, s32);
@@ -90,7 +126,7 @@ int __osSiDeviceBusy();
 extern s32 rngSeed;
 
 extern s32 gameMode;
-extern volatile s32 savestateCurrentSlot;
+
 enum GameModes {
  GAME_MODE_OVERWORLD = 0,
  GAME_MODE_JUNGLE_LAND_MENU = 1,

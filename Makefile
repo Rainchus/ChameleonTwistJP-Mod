@@ -12,40 +12,35 @@ PRINT := printf '
  ENDPURPLE := $(ENDCOLOR)
 ENDLINE := \n'
 
-OPTFLAGS := -O2
 
-all:
-	@mkdir -p obj
+# List of source files
+SOURCES = $(wildcard src/*.c)
 
-	@$(PRINT)$(GREEN)Compiling C file: $(ENDGREEN)$(BLUE)crash.c$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
-	@mips64-elf-gcc -Wall $(OPTFLAGS) -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/crash.c
-	@mv crash.o obj/
+# List of object files, generated from the source files
+OBJECTS = $(SOURCES:src/%.c=obj/%.o)
 
-	@$(PRINT)$(GREEN)Compiling C file: $(ENDGREEN)$(BLUE)print.c$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
-	@mips64-elf-gcc -Wall $(OPTFLAGS) -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/print.c
-	@mv print.o obj/
+CC := mips64-elf-gcc
+STANDARDFLAGS := -O2 -Wall -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0
+SPEEDFLAGS := -Os -Wall -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0
 
-	@$(PRINT)$(GREEN)Compiling C file: $(ENDGREEN)$(BLUE)ct1.c$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
-	@mips64-elf-gcc -Wall $(OPTFLAGS) -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/ct1.c
-	@mv ct1.o obj/
+# Default target
+all: $(OBJECTS) assemble
 
-	@$(PRINT)$(GREEN)Compiling C file: $(ENDGREEN)$(BLUE)lz4.c$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
-	@mips64-elf-gcc -Wall -Os -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/lz4.c
-	@mv lz4.o obj/
+# Rule for building object files from source files
+obj/%.o: src/%.c | obj
+	@$(PRINT)$(GREEN)Compiling C file: $(ENDGREEN)$(BLUE)$<$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
+	@$(CC) $(STANDARDFLAGS) -c $< -o $@
 
-	@$(PRINT)$(GREEN)Compiling C file: $(ENDGREEN)$(BLUE)lib.c$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
-	@mips64-elf-gcc -Wall $(OPTFLAGS) -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/lib.c
-	@mv lib.o obj/
-
-	@$(PRINT)$(GREEN)Compiling C file: $(ENDGREEN)$(BLUE)menu.c$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
-	@mips64-elf-gcc -Wall $(OPTFLAGS) -mtune=vr4300 -march=vr4300 -mabi=32 -fomit-frame-pointer -mno-abicalls -fno-pic -G0 -c src/menu.c
-	@mv menu.o obj/
-
-	@$(PRINT)$(GREEN)armips $(ENDGREEN)$(BLUE)asm/main.asm$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
+assemble: $(OBJECTS)
+	@$(PRINT)$(GREEN)Assembling with armips: $(ENDGREEN)$(BLUE)asm/main.asm$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
 	@armips asm/main.asm
-
 	@$(PRINT)$(GREEN)n64crc $(ENDGREEN)$(BLUE)"rom/ct1JP.mod.z64"$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
 	@n64crc "rom/ct1JP.mod.z64"
 
+# Rule for creating the obj folder
+obj:
+	@mkdir -p obj
+
+# Rule for cleaning up the project
 clean:
-	@rm -rf obj
+	@rm -f $(OBJECTS)

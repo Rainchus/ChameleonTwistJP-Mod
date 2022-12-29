@@ -12,18 +12,29 @@ typedef s32 (*menuProc) (void);
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
 
 u8 toggles[] = {
-    0, // TOGGLE_HIDE_TEXT
-    0  // TOGGLE_INFINITE_HEALTH
+    1, // TOGGLE_HIDE_IGT
+    1, // TOGGLE_HIDE_SAVESTATE_TEXT
+    0,  // TOGGLE_INFINITE_HEALTH
+    0  // TOGGLE_CUSTOM_DEBUG_TEXT
 };
 
-s32 toggleHideText(void) {
-    toggles[TOGGLE_HIDE_TEXT] ^= 1;
-    stateModeDisplay ^= 1;
+s32 toggleHideSavestateText(void) {
+    toggles[TOGGLE_HIDE_SAVESTATE_TEXT] ^= 1;
+    return 1;
+}
+
+s32 toggleHideIGT(void) {
+    toggles[TOGGLE_HIDE_IGT] ^= 1;
     return 1;
 }
 
 s32 toggleInfiniteHealth(void) {
     toggles[TOGGLE_INFINITE_HEALTH] ^= 1;
+    return 1;
+}
+
+s32 toggleCustomDebugText(void) {
+    toggles[TOGGLE_CUSTOM_DEBUG_TEXT] ^= 1;
     return 1;
 }
 
@@ -36,47 +47,35 @@ typedef struct menuPage {
 
 menuPage page1 = {
     .optionCount = 2,
-    .pageIndex = PAGE_JL,
+    .pageIndex = PAGE_MAIN,
     .options = {
-        "Toggle Hide Text\n",
-        "Infinite Health\n"
+        "Load Boss\n",
+        "Infinite Health\n",
     },
     .menuProc = {
-        &toggleHideText,
-        &toggleInfiniteHealth
+        &teleportToStageBoss,
+        &toggleInfiniteHealth,
     }
 };
 
 menuPage page0 = {
     .optionCount = 3,
-    .pageIndex = PAGE_MAIN,
+    .pageIndex = PAGE_JL,
     .options = {
-        "Load Boss\n",
-        "Page0 Option1\n",
-        "Page0 Option2\n",
+        "Toggle Hide Savestate Text\n",
+        "Toggle Hide IGT\n",
+        "Toggle Custom Debug Text\n"
     },
     .menuProc = {
-        &teleportToStageBoss,
-        &teleportToStageBoss,
-        &teleportToStageBoss
+        &toggleHideSavestateText,
+        &toggleHideIGT,
+        &toggleCustomDebugText
     }
 };
 
 menuPage* pageList[] = {
     &page0,
     &page1
-};
-
-enum MenuOptions {
-    MENU_OPTION_LOAD_BOSS = 0,
-    MENU_OPTION_TEST = 1,
-    MENU_OPTION_TEST2 = 2,
-    MENU_OPTION_TEST3 = 3,
-    MENU_OPTION_TEST4 = 4,
-    MENU_OPTION_TEST5 = 5,
-    MENU_OPTION_TEST6 = 6,
-    MENU_OPTION_TEST7 = 7,
-    MENU_OPTION_TEST8 = 8
 };
 
 //testing func ptr
@@ -87,14 +86,28 @@ void colorTextWrapper(s32* color) {
              color[8], color[9], color[10], color[11], color[12], color[13], color[14], color[15]);
 }
 
-s32 colorTest[] = {
+s32 menuHoveredTextColor[] = {
     0x0A, 0xFF, 0x00, 0xFF, // top
     0xFF, 0xFF, 0xFF, 0xFF, // bottom
     0x0A, 0xFF, 0x00, 0xFF, // top
     0xFF, 0xFF, 0x00, 0x0F  // bottom
 };
 
-s32 currPageNo = 1;
+s32 textWhiteColor[] = {
+    0xFF, 0xFF, 0xFF, 0xFF, // top
+    0xFF, 0xFF, 0xFF, 0xFF, // bottom
+    0xFF, 0xFF, 0xFF, 0xFF, // top
+    0xFF, 0xFF, 0xFF, 0xFF  // bottom
+};
+
+s32 textRedColor[] = {
+    0xFF, 0x00, 0x00, 0xFF, // top
+    0xFF, 0x00, 0x00, 0xFF, // bottom
+    0xFF, 0x00, 0x00, 0xFF, // top
+    0xFF, 0x00, 0x00, 0xFF  // bottom
+};
+
+s32 currPageNo = 0;
 s32 currOptionNo = 0;
 
 char menuOptionBuffer[50] = { 0 };  // Buffer for menu options text
@@ -106,11 +119,13 @@ void updateMenuInput(void){
     if (currentlyPressedButtons & DPAD_UP) {
         if (currOptionNo > 0) {
             currOptionNo--;
+            //playSound(0x2A, (void*)0x80168DA8, 0);
         }
     }
     else if (currentlyPressedButtons & DPAD_DOWN) {
         if (currOptionNo < pageList[currPageNo]->optionCount - 1) {
             currOptionNo++;
+            //playSound(0x2A, (void*)0x80168DA8, 0);
         }
     }
     else if (currentlyPressedButtons & DPAD_LEFT) {
@@ -145,14 +160,12 @@ void pageMainDisplay(s32 currPageNo, s32 currOptionNo) {
         convertAsciiToText(&menuOptionBufferConverted, (char*)&menuOptionBuffer);
 
         if (i == currOptionNo) {
-            colorTextWrapper(colorTest);
+            colorTextWrapper(menuHoveredTextColor);
         }
 
         textPrint(xPos, (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);
     }
 }
-
-// Boolean Menu Options (Toggles)
 
 
 

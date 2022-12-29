@@ -26,6 +26,7 @@
 .definelabel strchr, 0x800EBF64
 
 .definelabel currLevel, 0x80174877
+.definelabel currRoom, 0x8020D89C
 .definelabel loadBoss, 0x800C0CFC
 
 .definelabel p1ButtonsHeld, 0x80175680

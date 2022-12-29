@@ -11,5 +11,6 @@ void pageMainDisplay(s32 currPageNo, s32 currOptionNo);
 s32 menuDisplay(void);
 s32 menuProcFunc(void);
 s32 teleportToStageBoss(void);
+void colorTextWrapper(s32* color);
 
 #endif

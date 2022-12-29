@@ -246,6 +246,64 @@ void checkInputsForSavestates(void) {
     }
 }
 
+u8 timesvaulted = 0;
+
+// Only Runs in the cave skip room
+// TODO: Pause data after second vault; Add Speed Data
+s32 caveSkipPractice(void) {
+    if ((gameMode == GAME_MODE_OVERWORLD) && (currLevel == 0) && (currRoom == 0)) {
+        // Printout Location
+        f32 xPos = 20.0f;
+        f32 yPos = 35.0f;
+        f32 scale = 0.5f;
+        s32 style = 3;
+
+        // Data Needed
+        if (tongue.vaultTime == 1) {
+            timesvaulted++;
+        }
+
+        if (timesvaulted > 0) {
+            f32 caveAngleDiff = (p1.yAngle - 90.0f);
+            f32 caveAngleDiffAbs = ((caveAngleDiff < 0) ? -caveAngleDiff : caveAngleDiff);
+            if (caveAngleDiffAbs < 5.0f) {
+                colorTextWrapper(menuHoveredTextColor);
+            }
+            else {
+                colorTextWrapper(textRedColor);
+            }
+            _sprintf(textBuffer, "ANGLE OFF BY: %.4f\n", caveAngleDiffAbs);
+		    _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+		    convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+		    printText(xPos, yPos, 0, scale, 0, 0, &textBuffer2, style);
+
+            f32 caveZDiff = (2925.0f - p1.zPos);
+            f32 caveZDiffAbs = ((caveZDiff < 0) ? -caveZDiff : caveZDiff);
+            if (caveZDiff < 5.0f) {
+                colorTextWrapper(menuHoveredTextColor);
+            }
+            else {
+                colorTextWrapper(textRedColor);
+            }
+            _sprintf(textBuffer, "Z OFF BY: %.4f\n", caveZDiffAbs);
+			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			printText(xPos, (yPos += 10.0f), 0, scale, 0, 0, &textBuffer2, style);
+
+            _sprintf(textBuffer, "SPEED: %.4f\n", p1.forwardVel);
+			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			printText(xPos, (yPos += 10.0f), 0, scale, 0, 0, &textBuffer2, style);
+        }
+
+        //_sprintf(textBuffer, "VAUL: %02d\n", timesvaulted);
+		//_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+		//convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+		//printText(xPos, yPos, 0, scale, 0, 0, &textBuffer2, style);
+    }
+    return 1;
+}
+
 s32 printCustomDebugText(void) {
     f32 xPos = 20.0f;
     f32 yPos = 35.0f;
@@ -254,39 +312,39 @@ s32 printCustomDebugText(void) {
 
 	if (printTextBool == 1) {
 		if (P1Instance != NULL) {
-			// yPos += 10.0f;
-			// _sprintf(textBuffer, "XPos: %.4f\n", p1.xPos);
-			// _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			// convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			// printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+			yPos += 10.0f;
+			_sprintf(textBuffer, "XPos: %.4f\n", p1.xPos);
+			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			printText(xPos, yPos, 0, scale, 0, 0, &textBuffer2, style);
 
-			// yPos += 10.0f;
+			yPos += 10.0f;
 
-			// _sprintf(textBuffer, "YPos: %.4f\n", p1.yPos);
-			// _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			// convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			// printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+			_sprintf(textBuffer, "YPos: %.4f\n", p1.yPos);
+			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			printText(xPos, yPos, 0, scale, 0, 0, &textBuffer2, style);
 
-			// yPos += 10.0f;
+			yPos += 10.0f;
 
-			// _sprintf(textBuffer, "ZPos: %.4f\n", p1.zPos);
-			// _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			// convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			// printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+			_sprintf(textBuffer, "ZPos: %.4f\n", p1.zPos);
+			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			printText(xPos, yPos, 0, scale, 0, 0, &textBuffer2, style);
 
-			// yPos += 10.0f;
+			yPos += 10.0f;
 
-			// _sprintf(textBuffer, "ANGL: %.4f\n", p1.yAngle);
-			// _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			// convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			// printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+			_sprintf(textBuffer, "ANGL: %.4f\n", p1.yAngle);
+			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			printText(xPos, yPos, 0, scale, 0, 0, &textBuffer2, style);
 
-			// yPos += 10.0f;
+			yPos += 10.0f;
 
-			// _sprintf(textBuffer, "VAUL: %02d\n", tongue.vaultTime);
-			// _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			// convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			// printText(xPos, yPos, arga2, scale, arga4, arga5, &textBuffer2, style);
+			_sprintf(textBuffer, "VAUL: %02d\n", tongue.vaultTime);
+			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			printText(xPos, yPos, 0, scale, 0, 0, &textBuffer2, style);
 
 			yPos += 10.0f;
 		}
@@ -310,7 +368,8 @@ s32 teleportToStageBoss(void) {
     return 1;
 }
 
-void givePlayerMaxCrowns(void) {
+// Not Useful Now we have Game State Flag
+s32 givePlayerMaxCrowns(void) {
     // Gives Player Max Crowns
     if (gameMode == GAME_MODE_OVERWORLD) {
         jlCrowns = 25;
@@ -320,6 +379,7 @@ void givePlayerMaxCrowns(void) {
         dcCrowns = 24;
         gcCrowns = 23;
     }
+    return 1;
 }
 
 void printPausePractice(void) {
@@ -370,6 +430,8 @@ void mainCFunction(void) {
 	currentFileLevelUnlocks = 0xFF; //unlock all levels
     currentFileLevelUnlocks2 = 0xFF; //unlock all levels
 
+    caveSkipPractice();
+
     // Some Button
     if (isMenuActive == 1) {
         pageMainDisplay(currPageNo, currOptionNo);
@@ -394,7 +456,7 @@ void mainCFunction(void) {
             stateCooldown--;
         }
 
-        if (stateModeDisplay == 1) {
+        if (toggles[TOGGLE_HIDE_SAVESTATE_TEXT] == 1) {
             if (saveOrLoadStateMode == SAVE_MODE) {
                 textBuffer2[0] =  0xA3;
                 textBuffer2[1] = 0x60 + 's';
@@ -403,13 +465,20 @@ void mainCFunction(void) {
                 textBuffer2[1] = 0x60 + 'l';
             }
             textBuffer2[2] = 0;
+            textPrint(13.0f, 208.0f, 0.65f, &textBuffer2, 3);
+        }
 
-            //textPrint(13.0f, 208.0f, 0.65f, &textBuffer2, 3);
+        if (toggles[TOGGLE_HIDE_IGT] == 1) {
             if (gameMode == GAME_MODE_OVERWORLD){
                 if (isPaused == 0) {
                     drawTimer();
                 }
             }
+        }
+
+        if (toggles[TOGGLE_CUSTOM_DEBUG_TEXT] == 1) {
+            colorTextWrapper(textWhiteColor);
+            printCustomDebugText();
         }
         
     }

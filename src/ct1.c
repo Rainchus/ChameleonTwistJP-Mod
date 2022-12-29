@@ -288,7 +288,12 @@ s32 caveSkipPractice(void) {
             _sprintf(textBuffer, "Z OFF BY: %.4f\n", caveZDiffAbs);
 			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
 			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			printText(xPos, (yPos + 10.0f), 0, scale, 0, 0, &textBuffer2, style);
+			printText(xPos, (yPos += 10.0f), 0, scale, 0, 0, &textBuffer2, style);
+
+            _sprintf(textBuffer, "SPEED: %.4f\n", p1.forwardVel);
+			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			printText(xPos, (yPos += 10.0f), 0, scale, 0, 0, &textBuffer2, style);
         }
 
         //_sprintf(textBuffer, "VAUL: %02d\n", timesvaulted);

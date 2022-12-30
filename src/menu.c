@@ -10,6 +10,7 @@ enum Pages {
 
 typedef s32 (*menuProc) (void);
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
+#define ARRAY_COUNT_INDEX(arr) ARRAY_COUNT(arr) - 1
 
 u8 toggles[] = {
     1, // TOGGLE_HIDE_IGT
@@ -43,6 +44,7 @@ typedef struct menuPage {
     /* 0x0C */ s32 pageIndex;
     /* 0x10 */ char* options[FUNCS_PER_PAGE];
     /* 0x30 */ s32 (*menuProc[FUNCS_PER_PAGE]) (void);
+    /* 0x50 */ u8 flags[FUNCS_PER_PAGE];
 } menuPage;
 
 menuPage page1 = {
@@ -55,6 +57,10 @@ menuPage page1 = {
     .menuProc = {
         &teleportToStageBoss,
         &toggleInfiniteHealth,
+    },
+    .flags = {
+        -1,
+        TOGGLE_INFINITE_HEALTH
     }
 };
 
@@ -70,6 +76,11 @@ menuPage page0 = {
         &toggleHideSavestateText,
         &toggleHideIGT,
         &toggleCustomDebugText
+    },
+    .flags =  {
+        TOGGLE_HIDE_SAVESTATE_TEXT,
+        TOGGLE_HIDE_IGT,
+        TOGGLE_CUSTOM_DEBUG_TEXT
     }
 };
 
@@ -86,7 +97,14 @@ void colorTextWrapper(s32* color) {
              color[8], color[9], color[10], color[11], color[12], color[13], color[14], color[15]);
 }
 
-s32 menuHoveredTextColor[] = {
+s32 textCyanColor[] = {
+    0x2A, 0xEE, 0xE9, 0xFF, // top
+    0x00, 0xC0, 0xDA, 0xFF, // bottom
+    0x2A, 0xEE, 0xE9, 0xFF, // top
+    0x00, 0xC0, 0xDA, 0xFF  // bottom
+};
+
+s32 textGreenColor[] = {
     0x0A, 0xFF, 0x00, 0xFF, // top
     0xFF, 0xFF, 0xFF, 0xFF, // bottom
     0x0A, 0xFF, 0x00, 0xFF, // top
@@ -135,7 +153,7 @@ void updateMenuInput(void){
         }
     }
     else if (currentlyPressedButtons & DPAD_RIGHT) {
-        if (currPageNo < ARRAY_COUNT(pageList) - 1) {
+        if (currPageNo < ARRAY_COUNT_INDEX(pageList)) {
             currPageNo++;
             currOptionNo = 0;
         }
@@ -159,8 +177,22 @@ void pageMainDisplay(s32 currPageNo, s32 currOptionNo) {
         _bzero(&menuOptionBufferConverted, sizeof(menuOptionBufferConverted)); //clear buffer 2
         convertAsciiToText(&menuOptionBufferConverted, (char*)&menuOptionBuffer);
 
+        //get offset into toggle array we should read
+        if (currPage->flags[i] != -1) {
+            if (toggles[currPage->flags[i]] == 1) {
+                if (i == currOptionNo) {
+                    colorTextWrapper(textCyanColor);
+                } else {
+                    colorTextWrapper(textGreenColor);
+                }
+                textPrint(xPos, (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);
+                continue;
+            }
+        }
+
+        //highlight current cursor option red
         if (i == currOptionNo) {
-            colorTextWrapper(menuHoveredTextColor);
+            colorTextWrapper(textRedColor);
         }
 
         textPrint(xPos, (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);

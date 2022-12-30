@@ -22,7 +22,7 @@ extern u8 menuIsActive;
 
 extern u8 toggles[];
 extern s32 textWhiteColor[];
-extern s32 menuHoveredTextColor[];
+extern s32 textGreenColor[];
 extern s32 textRedColor[];
 
 enum Toggles {

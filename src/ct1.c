@@ -267,7 +267,7 @@ s32 caveSkipPractice(void) {
             f32 caveAngleDiff = (p1.yAngle - 90.0f);
             f32 caveAngleDiffAbs = ((caveAngleDiff < 0) ? -caveAngleDiff : caveAngleDiff);
             if (caveAngleDiffAbs < 5.0f) {
-                colorTextWrapper(menuHoveredTextColor);
+                colorTextWrapper(textGreenColor);
             }
             else {
                 colorTextWrapper(textRedColor);
@@ -280,7 +280,7 @@ s32 caveSkipPractice(void) {
             f32 caveZDiff = (2925.0f - p1.zPos);
             f32 caveZDiffAbs = ((caveZDiff < 0) ? -caveZDiff : caveZDiff);
             if (caveZDiff < 5.0f) {
-                colorTextWrapper(menuHoveredTextColor);
+                colorTextWrapper(textGreenColor);
             }
             else {
                 colorTextWrapper(textRedColor);

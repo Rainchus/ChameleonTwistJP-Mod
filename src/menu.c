@@ -5,6 +5,9 @@ enum Pages {
     PAGE_JL = 1
 };
 
+#define X_COORD_PER_LETTER 4.5
+// shift x value per print per length of string (8px per letter) then print ON/OFF
+
 #define FUNCS_PER_PAGE 8
 #define FUNCS_PER_LAST_PAGE 3
 
@@ -16,7 +19,8 @@ u8 toggles[] = {
     1, // TOGGLE_HIDE_IGT
     1, // TOGGLE_HIDE_SAVESTATE_TEXT
     0,  // TOGGLE_INFINITE_HEALTH
-    0  // TOGGLE_CUSTOM_DEBUG_TEXT
+    0,  // TOGGLE_CUSTOM_DEBUG_TEXT
+    0,  // TOGGLE_CAVE_SKIP_PRACTICE
 };
 
 s32 toggleHideSavestateText(void) {
@@ -38,6 +42,12 @@ s32 toggleCustomDebugText(void) {
     toggles[TOGGLE_CUSTOM_DEBUG_TEXT] ^= 1;
     return 1;
 }
+
+s32 toggleCaveSkipPractice(void) {
+    toggles[TOGGLE_CAVE_SKIP_PRACTICE] ^= 1;
+    return 1;
+}
+
 
 typedef struct menuPage {
     /* 0x08 */ s32 optionCount;
@@ -65,22 +75,25 @@ menuPage page1 = {
 };
 
 menuPage page0 = {
-    .optionCount = 3,
+    .optionCount = 4,
     .pageIndex = PAGE_JL,
     .options = {
-        "Toggle Hide Savestate Text\n",
-        "Toggle Hide IGT\n",
-        "Toggle Custom Debug Text\n"
+        "Hide Savestate Text\n",
+        "Hide IGT\n",
+        "Custom Debug Text\n",
+        "Cave Skip Practice\n"
     },
     .menuProc = {
         &toggleHideSavestateText,
         &toggleHideIGT,
-        &toggleCustomDebugText
+        &toggleCustomDebugText,
+        &toggleCaveSkipPractice
     },
     .flags =  {
         TOGGLE_HIDE_SAVESTATE_TEXT,
         TOGGLE_HIDE_IGT,
-        TOGGLE_CUSTOM_DEBUG_TEXT
+        TOGGLE_CUSTOM_DEBUG_TEXT,
+        TOGGLE_CAVE_SKIP_PRACTICE,
     }
 };
 
@@ -104,11 +117,19 @@ s32 textCyanColor[] = {
     0x00, 0xC0, 0xDA, 0xFF  // bottom
 };
 
+// Gradient
 s32 textGreenColor[] = {
     0x0A, 0xFF, 0x00, 0xFF, // top
     0xFF, 0xFF, 0xFF, 0xFF, // bottom
     0x0A, 0xFF, 0x00, 0xFF, // top
     0xFF, 0xFF, 0x00, 0x0F  // bottom
+};
+
+s32 textGreenMatColor[] = {
+    0x00, 0xFF, 0x00, 0xFF, // top
+    0x00, 0xFF, 0x00, 0xFF, // bottom
+    0x00, 0xFF, 0x00, 0xFF, // top
+    0x00, 0xFF, 0x00, 0xFF  // bottom
 };
 
 s32 textWhiteColor[] = {
@@ -176,23 +197,37 @@ void pageMainDisplay(s32 currPageNo, s32 currOptionNo) {
         _sprintf(menuOptionBuffer, "%s", currPage->options[i]);
         _bzero(&menuOptionBufferConverted, sizeof(menuOptionBufferConverted)); //clear buffer 2
         convertAsciiToText(&menuOptionBufferConverted, (char*)&menuOptionBuffer);
+        s32 strLength = ct_strlen((char*)&menuOptionBufferConverted);
 
         //get offset into toggle array we should read
         if (currPage->flags[i] != -1) {
-            if (toggles[currPage->flags[i]] == 1) {
-                if (i == currOptionNo) {
+            if (i == currOptionNo) {
                     colorTextWrapper(textCyanColor);
-                } else {
-                    colorTextWrapper(textGreenColor);
-                }
-                textPrint(xPos, (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);
+            }
+            textPrint(xPos, (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);
+            if (toggles[currPage->flags[i]] == 1) {
+                colorTextWrapper(textGreenMatColor);
+                _bzero(&menuOptionBuffer, sizeof(menuOptionBuffer)); //clear buffer
+                _sprintf(menuOptionBuffer, "ON");
+                _bzero(&menuOptionBufferConverted, sizeof(menuOptionBufferConverted)); //clear buffer 2
+                convertAsciiToText(&menuOptionBufferConverted, (char*)&menuOptionBuffer);
+                textPrint(xPos + (strLength * X_COORD_PER_LETTER), (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);
+                continue;
+            }
+            else if (toggles[currPage->flags[i]] == 0) {
+                colorTextWrapper(textRedColor);
+                _bzero(&menuOptionBuffer, sizeof(menuOptionBuffer)); //clear buffer
+                _sprintf(menuOptionBuffer, "OFF");
+                _bzero(&menuOptionBufferConverted, sizeof(menuOptionBufferConverted)); //clear buffer 2
+                convertAsciiToText(&menuOptionBufferConverted, (char*)&menuOptionBuffer);
+                textPrint(xPos + (strLength * X_COORD_PER_LETTER), (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);             
                 continue;
             }
         }
 
-        //highlight current cursor option red
+        //highlight current cursor option blue
         if (i == currOptionNo) {
-            colorTextWrapper(textRedColor);
+            colorTextWrapper(textCyanColor);
         }
 
         textPrint(xPos, (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);

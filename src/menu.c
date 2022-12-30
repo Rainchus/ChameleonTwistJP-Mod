@@ -78,8 +78,8 @@ menuPage page0 = {
     .optionCount = 4,
     .pageIndex = PAGE_JL,
     .options = {
-        "Hide Savestate Text\n",
-        "Hide IGT\n",
+        "Savestate Text\n",
+        "In Game Timer\n",
         "Custom Debug Text\n",
         "Cave Skip Practice\n"
     },

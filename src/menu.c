@@ -19,7 +19,8 @@ u8 toggles[] = {
     1, // TOGGLE_HIDE_IGT
     1, // TOGGLE_HIDE_SAVESTATE_TEXT
     0,  // TOGGLE_INFINITE_HEALTH
-    0  // TOGGLE_CUSTOM_DEBUG_TEXT
+    0,  // TOGGLE_CUSTOM_DEBUG_TEXT
+    0,  // TOGGLE_CAVE_SKIP_PRACTICE
 };
 
 s32 toggleHideSavestateText(void) {
@@ -41,6 +42,12 @@ s32 toggleCustomDebugText(void) {
     toggles[TOGGLE_CUSTOM_DEBUG_TEXT] ^= 1;
     return 1;
 }
+
+s32 toggleCaveSkipPractice(void) {
+    toggles[TOGGLE_CAVE_SKIP_PRACTICE] ^= 1;
+    return 1;
+}
+
 
 typedef struct menuPage {
     /* 0x08 */ s32 optionCount;
@@ -68,22 +75,25 @@ menuPage page1 = {
 };
 
 menuPage page0 = {
-    .optionCount = 3,
+    .optionCount = 4,
     .pageIndex = PAGE_JL,
     .options = {
         "Hide Savestate Text\n",
         "Hide IGT\n",
-        "Custom Debug Text\n"
+        "Custom Debug Text\n",
+        "Cave Skip Practice\n"
     },
     .menuProc = {
         &toggleHideSavestateText,
         &toggleHideIGT,
-        &toggleCustomDebugText
+        &toggleCustomDebugText,
+        &toggleCaveSkipPractice
     },
     .flags =  {
         TOGGLE_HIDE_SAVESTATE_TEXT,
         TOGGLE_HIDE_IGT,
-        TOGGLE_CUSTOM_DEBUG_TEXT
+        TOGGLE_CUSTOM_DEBUG_TEXT,
+        TOGGLE_CAVE_SKIP_PRACTICE,
     }
 };
 

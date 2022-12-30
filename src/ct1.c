@@ -248,10 +248,26 @@ void checkInputsForSavestates(void) {
 
 u8 timesvaulted = 0;
 
+s32 spinRoomTwoDoorClipPractice(void) {
+    if ((gameMode == GAME_MODE_OVERWORLD) && (currLevel == 4) && (currRoom == 11)) {
+        f32 xPos = 20.0f;
+        f32 yPos = 35.0f;
+        f32 scale = 0.5f;
+        s32 style = 3;
+
+        _sprintf(textBuffer, "VAUL: %02d\n", timesvaulted);
+		_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+		convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+		printText(xPos, yPos, 0, scale, 0, 0, &textBuffer2, style);
+    }
+    return 1;
+}
+
 // Only Runs in the cave skip room
 // TODO: Pause data after second vault; Add Speed Data
+
 s32 caveSkipPractice(void) {
-    if ((gameMode == GAME_MODE_OVERWORLD) && (currLevel == 0) && (currRoom == 0)) {
+    if ((gameMode == GAME_MODE_OVERWORLD) && (currLevel == 0) && (currRoom == 0) && (toggles[TOGGLE_CAVE_SKIP_PRACTICE] == 1)) {
         // Printout Location
         f32 xPos = 20.0f;
         f32 yPos = 35.0f;
@@ -272,6 +288,7 @@ s32 caveSkipPractice(void) {
             else {
                 colorTextWrapper(textRedColor);
             }
+            _bzero(&textBuffer, 50); //clear 50 bytes of buffer
             _sprintf(textBuffer, "ANGLE OFF BY: %.4f\n", caveAngleDiffAbs);
 		    _bzero(&textBuffer2, 50); //clear 50 bytes of buffer
 		    convertAsciiToText(&textBuffer2, (char*)&textBuffer);
@@ -279,21 +296,31 @@ s32 caveSkipPractice(void) {
 
             f32 caveZDiff = (2925.0f - p1.zPos);
             f32 caveZDiffAbs = ((caveZDiff < 0) ? -caveZDiff : caveZDiff);
-            if (caveZDiff < 5.0f) {
+            if ((p1.zPos < 2930.0f) && (p1.zPos > 2920.0f)) {
                 colorTextWrapper(textGreenColor);
             }
             else {
                 colorTextWrapper(textRedColor);
             }
             _sprintf(textBuffer, "Z OFF BY: %.4f\n", caveZDiffAbs);
-			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
+			_bzero(&textBuffer2, 100); //clear 50 bytes of buffer
 			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
 			printText(xPos, (yPos += 10.0f), 0, scale, 0, 0, &textBuffer2, style);
 
-            _sprintf(textBuffer, "SPEED: %.4f\n", p1.forwardVel);
-			_bzero(&textBuffer2, 50); //clear 50 bytes of buffer
-			convertAsciiToText(&textBuffer2, (char*)&textBuffer);
-			printText(xPos, (yPos += 10.0f), 0, scale, 0, 0, &textBuffer2, style);
+            //_sprintf(textBuffer, "Backwards vault so you hit the door", p1.forwardVel);
+			//_bzero(&textBuffer2, 100); //clear 50 bytes of buffer
+			//convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			//printText(xPos, 155.0f, 0, scale, 0, 0, &textBuffer2, style);
+
+            //_sprintf(textBuffer, "Run keeping the angle at around 90", p1.forwardVel);
+			//_bzero(&textBuffer2, 100); //clear 50 bytes of buffer
+			//convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			//printText(xPos, 175.0f, 0, scale, 0, 0, &textBuffer2, style);
+
+            //_sprintf(textBuffer, "Use a second vault on green z coord", p1.forwardVel);
+			//_bzero(&textBuffer2, 100); //clear 50 bytes of buffer
+			//convertAsciiToText(&textBuffer2, (char*)&textBuffer);
+			//printText(xPos, 195.0f, 0, scale, 0, 0, &textBuffer2, style);
         }
 
         //_sprintf(textBuffer, "VAUL: %02d\n", timesvaulted);
@@ -431,6 +458,7 @@ void mainCFunction(void) {
     currentFileLevelUnlocks2 = 0xFF; //unlock all levels
 
     caveSkipPractice();
+    //spinRoomTwoDoorClipPractice();
 
     // Some Button
     if (isMenuActive == 1) {

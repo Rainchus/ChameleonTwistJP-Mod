@@ -5,6 +5,9 @@ enum Pages {
     PAGE_JL = 1
 };
 
+#define X_COORD_PER_LETTER 4.5
+// shift x value per print per length of string (8px per letter) then print ON/OFF
+
 #define FUNCS_PER_PAGE 8
 #define FUNCS_PER_LAST_PAGE 3
 
@@ -68,9 +71,9 @@ menuPage page0 = {
     .optionCount = 3,
     .pageIndex = PAGE_JL,
     .options = {
-        "Toggle Hide Savestate Text\n",
-        "Toggle Hide IGT\n",
-        "Toggle Custom Debug Text\n"
+        "Hide Savestate Text\n",
+        "Hide IGT\n",
+        "Custom Debug Text\n"
     },
     .menuProc = {
         &toggleHideSavestateText,
@@ -104,11 +107,19 @@ s32 textCyanColor[] = {
     0x00, 0xC0, 0xDA, 0xFF  // bottom
 };
 
+// Gradient
 s32 textGreenColor[] = {
     0x0A, 0xFF, 0x00, 0xFF, // top
     0xFF, 0xFF, 0xFF, 0xFF, // bottom
     0x0A, 0xFF, 0x00, 0xFF, // top
     0xFF, 0xFF, 0x00, 0x0F  // bottom
+};
+
+s32 textGreenMatColor[] = {
+    0x00, 0xFF, 0x00, 0xFF, // top
+    0x00, 0xFF, 0x00, 0xFF, // bottom
+    0x00, 0xFF, 0x00, 0xFF, // top
+    0x00, 0xFF, 0x00, 0xFF  // bottom
 };
 
 s32 textWhiteColor[] = {
@@ -176,23 +187,37 @@ void pageMainDisplay(s32 currPageNo, s32 currOptionNo) {
         _sprintf(menuOptionBuffer, "%s", currPage->options[i]);
         _bzero(&menuOptionBufferConverted, sizeof(menuOptionBufferConverted)); //clear buffer 2
         convertAsciiToText(&menuOptionBufferConverted, (char*)&menuOptionBuffer);
+        s32 strLength = ct_strlen((char*)&menuOptionBufferConverted);
 
         //get offset into toggle array we should read
         if (currPage->flags[i] != -1) {
-            if (toggles[currPage->flags[i]] == 1) {
-                if (i == currOptionNo) {
+            if (i == currOptionNo) {
                     colorTextWrapper(textCyanColor);
-                } else {
-                    colorTextWrapper(textGreenColor);
-                }
-                textPrint(xPos, (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);
+            }
+            textPrint(xPos, (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);
+            if (toggles[currPage->flags[i]] == 1) {
+                colorTextWrapper(textGreenMatColor);
+                _bzero(&menuOptionBuffer, sizeof(menuOptionBuffer)); //clear buffer
+                _sprintf(menuOptionBuffer, "ON");
+                _bzero(&menuOptionBufferConverted, sizeof(menuOptionBufferConverted)); //clear buffer 2
+                convertAsciiToText(&menuOptionBufferConverted, (char*)&menuOptionBuffer);
+                textPrint(xPos + (strLength * X_COORD_PER_LETTER), (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);
+                continue;
+            }
+            else if (toggles[currPage->flags[i]] == 0) {
+                colorTextWrapper(textRedColor);
+                _bzero(&menuOptionBuffer, sizeof(menuOptionBuffer)); //clear buffer
+                _sprintf(menuOptionBuffer, "OFF");
+                _bzero(&menuOptionBufferConverted, sizeof(menuOptionBufferConverted)); //clear buffer 2
+                convertAsciiToText(&menuOptionBufferConverted, (char*)&menuOptionBuffer);
+                textPrint(xPos + (strLength * X_COORD_PER_LETTER), (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);             
                 continue;
             }
         }
 
-        //highlight current cursor option red
+        //highlight current cursor option blue
         if (i == currOptionNo) {
-            colorTextWrapper(textRedColor);
+            colorTextWrapper(textCyanColor);
         }
 
         textPrint(xPos, (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);

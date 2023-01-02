@@ -16,7 +16,7 @@ typedef s32 (*menuProc) (void);
 #define ARRAY_COUNT_INDEX(arr) ARRAY_COUNT(arr) - 1
 
 u8 toggles[] = {
-    0, // NO_TOGGLE
+    2, // NO_TOGGLE
     1, // TOGGLE_HIDE_IGT
     1, // TOGGLE_HIDE_SAVESTATE_TEXT
     0,  // TOGGLE_INFINITE_HEALTH

@@ -26,6 +26,7 @@ extern s32 textGreenColor[];
 extern s32 textRedColor[];
 
 enum Toggles {
+    NO_TOGGLE,
     TOGGLE_HIDE_SAVESTATE_TEXT,
     TOGGLE_HIDE_IGT,
     TOGGLE_INFINITE_HEALTH,

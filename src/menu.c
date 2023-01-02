@@ -16,6 +16,7 @@ typedef s32 (*menuProc) (void);
 #define ARRAY_COUNT_INDEX(arr) ARRAY_COUNT(arr) - 1
 
 u8 toggles[] = {
+    0, // NO_TOGGLE
     1, // TOGGLE_HIDE_IGT
     1, // TOGGLE_HIDE_SAVESTATE_TEXT
     0,  // TOGGLE_INFINITE_HEALTH
@@ -69,7 +70,7 @@ menuPage page1 = {
         &toggleInfiniteHealth,
     },
     .flags = {
-        -1,
+        NO_TOGGLE,
         TOGGLE_INFINITE_HEALTH
     }
 };
@@ -199,38 +200,37 @@ void pageMainDisplay(s32 currPageNo, s32 currOptionNo) {
         convertAsciiToText(&menuOptionBufferConverted, (char*)&menuOptionBuffer);
         s32 strLength = ct_strlen((char*)&menuOptionBufferConverted);
 
-        //get offset into toggle array we should read
-        if (currPage->flags[i] != -1) {
-            if (i == currOptionNo) {
-                    colorTextWrapper(textCyanColor);
-            }
-            textPrint(xPos, (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);
-            if (toggles[currPage->flags[i]] == 1) {
-                colorTextWrapper(textGreenMatColor);
-                _bzero(&menuOptionBuffer, sizeof(menuOptionBuffer)); //clear buffer
-                _sprintf(menuOptionBuffer, "ON");
-                _bzero(&menuOptionBufferConverted, sizeof(menuOptionBufferConverted)); //clear buffer 2
-                convertAsciiToText(&menuOptionBufferConverted, (char*)&menuOptionBuffer);
-                textPrint(xPos + (strLength * X_COORD_PER_LETTER), (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);
-                continue;
-            }
-            else if (toggles[currPage->flags[i]] == 0) {
-                colorTextWrapper(textRedColor);
-                _bzero(&menuOptionBuffer, sizeof(menuOptionBuffer)); //clear buffer
-                _sprintf(menuOptionBuffer, "OFF");
-                _bzero(&menuOptionBufferConverted, sizeof(menuOptionBufferConverted)); //clear buffer 2
-                convertAsciiToText(&menuOptionBufferConverted, (char*)&menuOptionBuffer);
-                textPrint(xPos + (strLength * X_COORD_PER_LETTER), (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);             
-                continue;
-            }
-        }
-
-        //highlight current cursor option blue
+        
         if (i == currOptionNo) {
             colorTextWrapper(textCyanColor);
         }
 
+        if (currPage->flags[i] == -1) {
+            textPrint(xPos, (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);
+            continue;
+        }
+
+        //get offset into toggle array we should read
         textPrint(xPos, (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);
+        
+        //clear buffers
+        _bzero(&menuOptionBuffer, sizeof(menuOptionBuffer));
+        _bzero(&menuOptionBufferConverted, sizeof(menuOptionBufferConverted));
+
+        if (toggles[currPage->flags[i]] == 1) {
+            colorTextWrapper(textGreenMatColor);
+            _sprintf(menuOptionBuffer, "ON");
+        } else if (toggles[currPage->flags[i]] == 0) {
+            colorTextWrapper(textRedColor);
+            _sprintf(menuOptionBuffer, "OFF");
+        } else {
+            //is 2, dont print on/off
+            continue;
+        }
+
+        convertAsciiToText(&menuOptionBufferConverted, (char*)&menuOptionBuffer);
+        textPrint(xPos + (strLength * X_COORD_PER_LETTER), (yPos + (i * 15.0f)), 0.5f, &menuOptionBufferConverted, 1);  
+
     }
 }
 

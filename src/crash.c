@@ -289,7 +289,9 @@ void crash_screen_draw(OSThread* faultedThread) {
 
     // all of these null terminators needed to pad the rodata section for this file
     // can potentially fix this problem in another way?
-    crash_screen_printf(210, 140, "MM:%08XH\0\0\0\0\0\0\0\0", *(u32*)ctx->pc);
+    crash_screen_printf(210, 140, "MM:%08XH", *(u32*)ctx->pc);
+
+    crash_screen_sleep(3000); //sleep 3 seconds
 }
 
 OSThread* crash_screen_get_faulted_thread(void) {

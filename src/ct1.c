@@ -8,6 +8,8 @@ extern void* crash_screen_copy_to_buf(void* dest, const char* src, u32 size);
 s32 controllerData = 0x80175650;
 u8 menuIsActive = 0;
 
+volatile s32 isSaveOrLoadActive = 0;
+
 typedef struct CustomThread {
     /* 0x000 */ OSThread thread;
     /* 0x1B0 */ char stack[0xC000];
@@ -105,6 +107,7 @@ int cBootMain(void) {
     stateModeDisplay = 1;
     debugBool = 0;
     stateCooldown = 0;
+    isSaveOrLoadActive = 0;
 	return 1;
 }
 
@@ -161,6 +164,7 @@ void loadstateMain(void) {
     }
     setStatusRegister(status);
     __osRestoreInt();
+    isSaveOrLoadActive = 0; //allow thread 3 to continue
 }
     
 void savestateMain(void) {
@@ -196,6 +200,7 @@ void savestateMain(void) {
     }
     setStatusRegister(status);
     __osRestoreInt();
+    isSaveOrLoadActive = 0; //allow thread 3 to continue
 }
 
 void updateCustomInputTracking(void) {
@@ -233,11 +238,13 @@ void checkInputsForSavestates(void) {
     gameMode != GAME_MODE_JUNGLE_LAND_MENU &&
     isPaused == 0) {
         if (saveOrLoadStateMode == SAVE_MODE) {
+            isSaveOrLoadActive = 1;
             osCreateThread(&gCustomThread.thread, 255, (void*)savestateMain, NULL,
                     gCustomThread.stack + sizeof(gCustomThread.stack), 255);
             osStartThread(&gCustomThread.thread);
             stateCooldown = 5;
         } else {
+            isSaveOrLoadActive = 1;
             osCreateThread(&gCustomThread.thread, 255, (void*)loadstateMain, NULL,
                     gCustomThread.stack + sizeof(gCustomThread.stack), 255);
             osStartThread(&gCustomThread.thread);
@@ -511,5 +518,7 @@ void mainCFunction(void) {
         
     }
 
-    
+    //if a savestate is being saved/loaded, stall thread
+    while (isSaveOrLoadActive != 0) {}
+
 }

@@ -72,6 +72,7 @@ extern s32 savestate2Size;
 extern s32 savestate3Size;
 extern s32 savestate4Size;
 extern s32 stateModeDisplay;
+extern s32 KLTogglePrintBool;
 // End Save States //
 
 // Player 1 //

@@ -43,8 +43,9 @@ void _sprintf(void* destination, void* fmt, ...) {
 void convertAsciiToText(void* buffer, char* source) {
     u16* buf = (u16*)buffer;
     s32 strlength = ct_strlen(source);
+    s32 i;
 
-    for (s32 i = 0; i < strlength; i++) {
+    for (i = 0; i < strlength; i++) {
         if ( (source[i] >= '0' && source[i] <= '9') ||
             (source[i] >= 'A' && source[i] <= 'Z')) { //is 0 - 9 or A - Z
             buf[i] = source[i] + 0xA380; //0x30 = 0 in ascii, 0xA3B0 = 0 in chameleon text
@@ -61,6 +62,32 @@ void convertAsciiToText(void* buffer, char* source) {
             buf[i] = 0xA1A1; // ' ' in chameleon text
         }
     }
+    buf[i] = 0; //terminate buffer
+}
+
+void convertAsciiToText2(void* buffer, char* source) {
+    u16* buf = (u16*)buffer;
+    s32 strlength = ct_strlen(source);
+    s32 i;
+
+    for (i = 0; i < strlength; i++) {
+        if ( (source[i] >= '0' && source[i] <= '9') ||
+            (source[i] >= 'A' && source[i] <= 'Z')) { //is 0 - 9 or A - Z
+            buf[i] = source[i] + 0xA380; //0x30 = 0 in ascii, 0xA3B0 = 0 in chameleon text
+        } else if ( (source[i] > '0' && source[i] <= '9') ||
+            (source[i] >= 'a' && source[i] <= 'z')) { //is 0 - 9 or A - Z
+            buf[i] = source[i] + 0xA360; //0x30 = 0 in ascii, 0xA3B0 = 0 in chameleon text
+        } else if(source[i] == '-') {
+            buf[i] = 0xA1DD; // '-' in chameleon text
+        } else if (source[i] == '.') {
+            buf[i] = 0xA1C7; // ' ' ' in chameleon text (apostrophe)
+        } else if (source[i] == ':') {
+            buf[i] = 0xA1A7; // ':' in chameleon text
+        } else if (source[i] == ' ') {
+            buf[i] = 0xA1A1; // ' ' in chameleon text
+        }
+    }
+    buf[i] = 0; //terminate buffer
 }
 
 // ------------- FPS COUNTER ---------------
@@ -216,6 +243,43 @@ void updateCustomInputTracking(void) {
     previouslyHeldButtons = heldButtonsMain;
 }
 
+extern s32 textGreenMatColor[];
+extern s32 textCyanColor[];
+extern s32 textWhiteColor[];
+
+void KLTogglePrinting(void) {
+    char messageBuffer[20];
+    char convertedMessageBuffer[sizeof(messageBuffer) * 2];
+
+    colorTextWrapper(textGreenMatColor);
+    _bzero(messageBuffer, sizeof(messageBuffer)); //clear buffer
+    _sprintf(messageBuffer, "SPD: %.2f", p1.forwardVel);
+    _bzero(convertedMessageBuffer, sizeof(convertedMessageBuffer)); //clear buffer
+    convertAsciiToText2(&convertedMessageBuffer, (char*)&messageBuffer);
+    textPrint(13.0f, 170.0f, 0.5f, &convertedMessageBuffer, 1);
+
+    colorTextWrapper(textCyanColor);
+    _bzero(messageBuffer, sizeof(messageBuffer)); //clear buffer
+    _sprintf(messageBuffer, "ANG: %.2f", p1.yAngle);
+    _bzero(convertedMessageBuffer, sizeof(convertedMessageBuffer)); //clear buffer
+    convertAsciiToText2(&convertedMessageBuffer, (char*)&messageBuffer);
+    textPrint(13.0f, 182.0f, 0.5f, &convertedMessageBuffer, 1);
+
+    colorTextWrapper(textWhiteColor);
+    _bzero(messageBuffer, sizeof(messageBuffer)); //clear buffer
+    _sprintf(messageBuffer, "X: %.2f", p1.xPos);
+    _bzero(convertedMessageBuffer, sizeof(convertedMessageBuffer)); //clear buffer
+    convertAsciiToText2(&convertedMessageBuffer, (char*)&messageBuffer);
+    textPrint(13.0f, 194.0f, 0.5f, &convertedMessageBuffer, 1);
+
+    colorTextWrapper(textWhiteColor);
+    _bzero(messageBuffer, sizeof(messageBuffer)); //clear buffer
+    _sprintf(messageBuffer, "Z: %.2f", p1.zPos);
+    _bzero(convertedMessageBuffer, sizeof(convertedMessageBuffer)); //clear buffer
+    convertAsciiToText2(&convertedMessageBuffer, (char*)&messageBuffer);
+    textPrint(13.0f, 206.0f, 0.5f, &convertedMessageBuffer, 1);
+}
+
 void checkInputsForSavestates(void) {
     savestateCurrentSlot = -1;//set to invalid
 
@@ -227,8 +291,12 @@ void checkInputsForSavestates(void) {
         savestateCurrentSlot = 1;
     }
 
+    // if (currentlyPressedButtons & DPAD_RIGHT) {
+    //     savestateCurrentSlot = 2;
+    // }
     if (currentlyPressedButtons & DPAD_RIGHT) {
-        savestateCurrentSlot = 2;
+        //KL specific code
+        KLTogglePrintBool ^= 1;
     }
 
     if (savestateCurrentSlot == -1 || stateCooldown != 0){
@@ -476,7 +544,7 @@ void mainCFunction(void) {
         updateMenuInput();
     }
     else {
-        printPausePractice();
+        //printPausePractice();
 
         if (stateCooldown == 0) {
             if ((heldButtonsMain & R_BUTTON) && (currentlyPressedButtons & DPAD_UP)) {
@@ -503,7 +571,7 @@ void mainCFunction(void) {
                 textBuffer2[1] = 0x60 + 'l';
             }
             textBuffer2[2] = 0;
-            textPrint(13.0f, 208.0f, 0.65f, &textBuffer2, 3);
+            textPrint(13.0f, 218.0f, 0.65f, &textBuffer2, 3);
         }
 
         if (toggles[TOGGLE_HIDE_IGT] == 1) {
@@ -519,6 +587,10 @@ void mainCFunction(void) {
             printCustomDebugText();
         }
         
+    }
+
+    if (KLTogglePrintBool == 1) {
+        KLTogglePrinting();
     }
 
     //if a savestate is being saved/loaded, stall thread

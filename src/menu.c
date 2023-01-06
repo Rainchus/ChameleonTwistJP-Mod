@@ -17,8 +17,8 @@ typedef s32 (*menuProc) (void);
 
 u8 toggles[] = {
     2, // NO_TOGGLE
-    1, // TOGGLE_HIDE_IGT
     1, // TOGGLE_HIDE_SAVESTATE_TEXT
+    0, // TOGGLE_HIDE_IGT
     0,  // TOGGLE_INFINITE_HEALTH
     0,  // TOGGLE_CUSTOM_DEBUG_TEXT
     0,  // TOGGLE_CAVE_SKIP_PRACTICE
@@ -110,6 +110,7 @@ void colorTextWrapper(s32* color) {
     colorText(color[0], color[1], color[2], color[3], color[4], color[5], color[6], color[7],
              color[8], color[9], color[10], color[11], color[12], color[13], color[14], color[15]);
 }
+
 
 s32 textCyanColor[] = {
     0x2A, 0xEE, 0xE9, 0xFF, // top

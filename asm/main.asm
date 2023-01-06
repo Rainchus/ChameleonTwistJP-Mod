@@ -6,7 +6,6 @@
 .org 0x80420000
 .include "asm/boot.asm"
 .importobj "obj/print.o"
-.importobj "obj/test.o"
 .importobj "obj/menu.o"
 .importobj "obj/crash.o"
 .importobj "obj/ct1.o"

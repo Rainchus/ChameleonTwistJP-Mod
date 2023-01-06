@@ -108,6 +108,9 @@ int cBootMain(void) {
     debugBool = 0;
     stateCooldown = 0;
     isSaveOrLoadActive = 0;
+    savestate1Size = 0;
+    savestate2Size = 0;
+    savestate3Size = 0;
 	return 1;
 }
 

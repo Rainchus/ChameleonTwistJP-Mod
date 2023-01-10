@@ -173,3 +173,4 @@ NOP
 
 .include "asm/registers.asm"
 .include "asm/printf.asm"
+.include "asm/customASM.asm"

@@ -32,6 +32,7 @@ enum Toggles {
     TOGGLE_INFINITE_HEALTH,
     TOGGLE_CUSTOM_DEBUG_TEXT,
     TOGGLE_CAVE_SKIP_PRACTICE,
+    TOGGLE_OBJECT_SPAWNS_OFF,
 };
 
 // Menu //
@@ -164,6 +165,8 @@ int __osSiDeviceBusy();
 extern s32 rngSeed;
 
 extern s32 gameMode;
+
+extern s8 toggleSpawnsOff;  // 0 = on, 1 = off | Objects / Enemies Spawning
 
 enum GameModes {
  GAME_MODE_OVERWORLD = 0,

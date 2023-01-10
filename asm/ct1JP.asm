@@ -130,8 +130,9 @@ NOP
 .org 0x800A1090
 NOP
 
-//.org 8002D660
-//ADDIU a0, r0, 0x0 // No enemies or objects appear
+.org 0x8002D660
+J _tobj // hook to object test
+NOP
 
 .org 0x80089BB4 //in game time hook
 NOP

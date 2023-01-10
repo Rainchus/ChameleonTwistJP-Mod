@@ -22,6 +22,7 @@ u8 toggles[] = {
     0,  // TOGGLE_INFINITE_HEALTH
     0,  // TOGGLE_CUSTOM_DEBUG_TEXT
     0,  // TOGGLE_CAVE_SKIP_PRACTICE
+    0, // TOGGLE_OBJECT_SPAWNS_OFF
 };
 
 s32 toggleHideSavestateText(void) {
@@ -46,6 +47,12 @@ s32 toggleCustomDebugText(void) {
 
 s32 toggleCaveSkipPractice(void) {
     toggles[TOGGLE_CAVE_SKIP_PRACTICE] ^= 1;
+    return 1;
+}
+
+s32 toggleObjectSpawnsOff(void) {
+    toggles[TOGGLE_OBJECT_SPAWNS_OFF] ^= 1;
+    toggleSpawnsOff ^= 1;
     return 1;
 }
 
@@ -76,25 +83,28 @@ menuPage page1 = {
 };
 
 menuPage page0 = {
-    .optionCount = 4,
+    .optionCount = 5,
     .pageIndex = PAGE_JL,
     .options = {
         "Savestate Text\n",
         "In Game Timer\n",
         "Custom Debug Text\n",
-        "Cave Skip Practice\n"
+        "Cave Skip Practice\n",
+        "Disable Actors\n",
     },
     .menuProc = {
         &toggleHideSavestateText,
         &toggleHideIGT,
         &toggleCustomDebugText,
-        &toggleCaveSkipPractice
+        &toggleCaveSkipPractice,
+        &toggleObjectSpawnsOff,
     },
     .flags =  {
         TOGGLE_HIDE_SAVESTATE_TEXT,
         TOGGLE_HIDE_IGT,
         TOGGLE_CUSTOM_DEBUG_TEXT,
         TOGGLE_CAVE_SKIP_PRACTICE,
+        TOGGLE_OBJECT_SPAWNS_OFF,
     }
 };
 

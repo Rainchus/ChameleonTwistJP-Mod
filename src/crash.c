@@ -383,5 +383,4 @@ void crash_screen_printf_with_bg(s16 x, s16 y, const char* fmt, ...) {
 
 void cBootFunction(void) { //ran once on boot
     crash_screen_init();
-    KLTogglePrintBool = 0;
 }

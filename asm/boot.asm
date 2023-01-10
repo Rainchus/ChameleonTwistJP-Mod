@@ -23,6 +23,9 @@ LUI a1, 0x8010
 J 0x80090724
 LW a1, 0xFEB4 (a1)
 
+customVar:
+.word 0x00000000
+
 customMemCpy: //requires 0x08 alignment
 BLEZ a2, exitMemCpy
 LD t0, 0x0000 (a1)

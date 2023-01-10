@@ -2,6 +2,10 @@
 
 extern void* crash_screen_copy_to_buf(void* dest, const char* src, u32 size);
 
+extern s32 KLTogglePrintCooldown;
+extern s32 KLTogglePrintBool;
+extern s32 saveOrLoadStateModeToggleCooldown;
+
 #define SAVE_MODE 0
 #define LOAD_MODE 1
 
@@ -138,6 +142,9 @@ int cBootMain(void) {
     savestate1Size = 0;
     savestate2Size = 0;
     savestate3Size = 0;
+    KLTogglePrintBool = 0;
+    saveOrLoadStateModeToggleCooldown = 0;
+    KLTogglePrintCooldown = 0;
 	return 1;
 }
 
@@ -256,28 +263,28 @@ void KLTogglePrinting(void) {
     _sprintf(messageBuffer, "SPD: %.2f", p1.forwardVel);
     _bzero(convertedMessageBuffer, sizeof(convertedMessageBuffer)); //clear buffer
     convertAsciiToText2(&convertedMessageBuffer, (char*)&messageBuffer);
-    textPrint(13.0f, 170.0f, 0.5f, &convertedMessageBuffer, 1);
+    textPrint(13.0f, 158.0f, 0.5f, &convertedMessageBuffer, 1);
 
     colorTextWrapper(textCyanColor);
     _bzero(messageBuffer, sizeof(messageBuffer)); //clear buffer
     _sprintf(messageBuffer, "ANG: %.2f", p1.yAngle);
     _bzero(convertedMessageBuffer, sizeof(convertedMessageBuffer)); //clear buffer
     convertAsciiToText2(&convertedMessageBuffer, (char*)&messageBuffer);
-    textPrint(13.0f, 182.0f, 0.5f, &convertedMessageBuffer, 1);
+    textPrint(13.0f, 170.0f, 0.5f, &convertedMessageBuffer, 1);
 
     colorTextWrapper(textWhiteColor);
     _bzero(messageBuffer, sizeof(messageBuffer)); //clear buffer
     _sprintf(messageBuffer, "X: %.2f", p1.xPos);
     _bzero(convertedMessageBuffer, sizeof(convertedMessageBuffer)); //clear buffer
     convertAsciiToText2(&convertedMessageBuffer, (char*)&messageBuffer);
-    textPrint(13.0f, 194.0f, 0.5f, &convertedMessageBuffer, 1);
+    textPrint(13.0f, 182.0f, 0.5f, &convertedMessageBuffer, 1);
 
     colorTextWrapper(textWhiteColor);
     _bzero(messageBuffer, sizeof(messageBuffer)); //clear buffer
     _sprintf(messageBuffer, "Z: %.2f", p1.zPos);
     _bzero(convertedMessageBuffer, sizeof(convertedMessageBuffer)); //clear buffer
     convertAsciiToText2(&convertedMessageBuffer, (char*)&messageBuffer);
-    textPrint(13.0f, 206.0f, 0.5f, &convertedMessageBuffer, 1);
+    textPrint(13.0f, 194.0f, 0.5f, &convertedMessageBuffer, 1);
 }
 
 void checkInputsForSavestates(void) {
@@ -296,7 +303,10 @@ void checkInputsForSavestates(void) {
     // }
     if (currentlyPressedButtons & DPAD_RIGHT) {
         //KL specific code
-        KLTogglePrintBool ^= 1;
+        if (KLTogglePrintCooldown == 0) {
+            KLTogglePrintBool ^= 1;
+            KLTogglePrintCooldown = 5;
+        }
     }
 
     if (savestateCurrentSlot == -1 || stateCooldown != 0){
@@ -547,19 +557,17 @@ void mainCFunction(void) {
         //printPausePractice();
 
         if (stateCooldown == 0) {
-            if ((heldButtonsMain & R_BUTTON) && (currentlyPressedButtons & DPAD_UP)) {
-                debugBool ^= 1;
-            } else if ((heldButtonsMain & R_BUTTON) && (currentlyPressedButtons & DPAD_DOWN)) {
-                isMenuActive ^= 1;
-            } else if (currentlyPressedButtons & DPAD_DOWN) {
-                saveOrLoadStateMode ^= 1;
-            } else {
-                checkInputsForSavestates();
+            if (saveOrLoadStateModeToggleCooldown == 0) {
+                if ((heldButtonsMain & R_BUTTON) && (currentlyPressedButtons & DPAD_UP)) {
+                    debugBool ^= 1;
+                } else if ((heldButtonsMain & R_BUTTON) && (currentlyPressedButtons & DPAD_DOWN)) {
+                    isMenuActive ^= 1;
+                } else if (currentlyPressedButtons & DPAD_DOWN) {
+                    saveOrLoadStateMode ^= 1;
+                } else {
+                    checkInputsForSavestates();
+                }
             }
-        }
-
-        if (stateCooldown > 0) {
-            stateCooldown--;
         }
 
         if (toggles[TOGGLE_HIDE_SAVESTATE_TEXT] == 1) {
@@ -571,7 +579,7 @@ void mainCFunction(void) {
                 textBuffer2[1] = 0x60 + 'l';
             }
             textBuffer2[2] = 0;
-            textPrint(13.0f, 218.0f, 0.65f, &textBuffer2, 3);
+            textPrint(13.0f, 206.0f, 0.65f, &textBuffer2, 3);
         }
 
         if (toggles[TOGGLE_HIDE_IGT] == 1) {
@@ -587,6 +595,19 @@ void mainCFunction(void) {
             printCustomDebugText();
         }
         
+    }
+
+
+    if (stateCooldown > 0) {
+        stateCooldown--;
+    }
+
+    if (KLTogglePrintCooldown > 0) {
+        KLTogglePrintCooldown--;
+    }
+
+    if (saveOrLoadStateModeToggleCooldown > 0) {
+        saveOrLoadStateModeToggleCooldown--;
     }
 
     if (KLTogglePrintBool == 1) {

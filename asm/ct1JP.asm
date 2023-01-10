@@ -83,6 +83,9 @@
 .definelabel textBuffer2, 0x807F0200
 
 .definelabel heldButtonsMain, 0x80175650
+
+.definelabel saveOrLoadStateModeToggleCooldown, 0x807FFFB8
+.definelabel KLTogglePrintCooldown, 0x807FFFBC
 .definelabel KLTogglePrintBool, 0x807FFFC0
 .definelabel stateCooldown, 0x807FFFC4
 //0x807FFFC8 taken by temp var

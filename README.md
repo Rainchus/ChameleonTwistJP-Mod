@@ -1,4 +1,4 @@
-# PracTwist v0.3.0
+# PracTwist v0.3.4
 
 A speedrun practice mod for the JP chameleon twist rom that adds save states; a crash screen and an in game timer.
 Also included is a toggle for the in game debug mode that exists.</br>

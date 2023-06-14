@@ -37,7 +37,7 @@ assemble: $(OBJECTS)
 	@$(PRINT)$(GREEN)Assembling with armips: $(ENDGREEN)$(BLUE)asm/main.asm$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
 	@armips asm/main.asm
 	@$(PRINT)$(GREEN)n64crc $(ENDGREEN)$(BLUE)"rom/ct1JP.mod.z64"$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)
-	@n64crc "rom/ct1JP.mod.z64"
+	@./n64crc.exe "rom/ct1JP.mod.z64"
 
 genMain:
 	@$(PRINT)$(GREEN)Generating: $(ENDGREEN)$(BLUE)asm/main.asm$(ENDBLUE)$(ENDCOLOR)$(ENDLINE)

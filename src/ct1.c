@@ -102,7 +102,6 @@ void print_fps(void) {
 int cBootMain(void) {
 	crash_screen_init();
     set_gp();
-    saveOrLoadStateMode = SAVE_MODE;
     savestateCurrentSlot = 0;
     stateModeDisplay = 1;
     debugBool = 0;
@@ -147,24 +146,19 @@ void loadstateMain(void) {
     osInvalICache((void*)0x80000000, 0x2000);
 	osInvalDCache((void*)0x80000000, 0x2000);
     __osDisableInt();
-    //decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate1Size, ramAddrSavestateDataSlot1); //always decompresses to `ramStartAddr`
     switch (savestateCurrentSlot) {
-        case DPAD_LEFT_CASE:
+        case 0: //dpad left
             if (savestate1Size != 0 && savestate1Size != -1) {
-                decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate1Size, ramAddrSavestateDataSlot1); //always decompresses to `ramStartAddr`
-            }  
-        break;
-        case DPAD_UP_CASE:
-            if (savestate2Size != 0 && savestate2Size != -1) {
-                decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate2Size, ramAddrSavestateDataSlot2); //always decompresses to `ramStartAddr`
+                decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate1Size, ramAddrSavestateDataSlot1);
             }
-        break;
-        case DPAD_RIGHT_CASE:
-            if (savestate3Size != 0 && savestate3Size != -1) {
-                decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate3Size, ramAddrSavestateDataSlot3); //always decompresses to `ramStartAddr`
-            }  
-        break;
+            break;
+        case 1:
+            if (savestate2Size != 0 && savestate2Size != -1) {
+                decompress_lz4_ct_default(ramEndAddr - ramStartAddr, savestate2Size, ramAddrSavestateDataSlot2);
+            }
+            break;
     }
+
     setStatusRegister(status);
     __osRestoreInt();
     isSaveOrLoadActive = 0; //allow thread 3 to continue
@@ -191,14 +185,12 @@ void savestateMain(void) {
 
     __osDisableInt();
     switch (savestateCurrentSlot) {
-        case DPAD_LEFT_CASE:
+        case 0:
             savestate1Size = compress_lz4_ct_default(ramStartAddr, ramEndAddr - ramStartAddr, ramAddrSavestateDataSlot1);
         break;
-        case DPAD_UP_CASE:
+
+        case 1:
             savestate2Size = compress_lz4_ct_default(ramStartAddr, ramEndAddr - ramStartAddr, ramAddrSavestateDataSlot2);
-        break;
-        case DPAD_RIGHT_CASE:
-            savestate3Size = compress_lz4_ct_default(ramStartAddr, ramEndAddr - ramStartAddr, ramAddrSavestateDataSlot3);
         break;
     }
     setStatusRegister(status);
@@ -217,42 +209,27 @@ void updateCustomInputTracking(void) {
 }
 
 void checkInputsForSavestates(void) {
-    savestateCurrentSlot = -1;//set to invalid
 
-    if (currentlyPressedButtons & DPAD_LEFT) {
-        savestateCurrentSlot = 0;
-    }
-
-    if (currentlyPressedButtons & DPAD_UP) {
-        savestateCurrentSlot = 1;
-    }
-
-    if (currentlyPressedButtons & DPAD_RIGHT) {
-        savestateCurrentSlot = 2;
-    }
-
-    if (savestateCurrentSlot == -1 || stateCooldown != 0){
+    if (stateCooldown != 0){
         return;
     }
 
-    if (gameMode != GAME_MODE_STAGE_SELECT &&
-    gameMode != GAME_MODE_NEW_GAME_MENU &&
-    gameMode != GAME_MODE_TITLE_SCREEN &&
-    gameMode != GAME_MODE_JUNGLE_LAND_MENU &&
-    isPaused == 0) {
-        if (saveOrLoadStateMode == SAVE_MODE) {
-            isSaveOrLoadActive = 1;
-            osCreateThread(&gCustomThread.thread, 255, (void*)savestateMain, NULL,
-                    gCustomThread.stack + sizeof(gCustomThread.stack), 255);
-            osStartThread(&gCustomThread.thread);
-            stateCooldown = 5;
-        } else {
-            isSaveOrLoadActive = 1;
-            osCreateThread(&gCustomThread.thread, 255, (void*)loadstateMain, NULL,
-                    gCustomThread.stack + sizeof(gCustomThread.stack), 255);
-            osStartThread(&gCustomThread.thread);
-            stateCooldown = 5;            
-        }
+    if (gameMode != GAME_MODE_STAGE_SELECT && gameMode != GAME_MODE_NEW_GAME_MENU &&
+        gameMode != GAME_MODE_TITLE_SCREEN && gameMode != GAME_MODE_JUNGLE_LAND_MENU &&
+        isPaused == 0) {
+            if (currentlyPressedButtons & DPAD_LEFT) {
+                isSaveOrLoadActive = 1;
+                osCreateThread(&gCustomThread.thread, 255, (void*)savestateMain, NULL,
+                        gCustomThread.stack + sizeof(gCustomThread.stack), 255);
+                osStartThread(&gCustomThread.thread);
+                stateCooldown = 5;
+            } else if (currentlyPressedButtons & DPAD_RIGHT) {
+                isSaveOrLoadActive = 1;
+                osCreateThread(&gCustomThread.thread, 255, (void*)loadstateMain, NULL,
+                        gCustomThread.stack + sizeof(gCustomThread.stack), 255);
+                osStartThread(&gCustomThread.thread);
+                stateCooldown = 5;   
+            }
     }
 }
 
@@ -476,7 +453,7 @@ void mainCFunction(void) {
         updateMenuInput();
     }
     else {
-        printPausePractice();
+        //printPausePractice();
 
         if (stateCooldown == 0) {
             if ((heldButtonsMain & R_BUTTON) && (currentlyPressedButtons & DPAD_UP)) {
@@ -484,7 +461,7 @@ void mainCFunction(void) {
             } else if ((heldButtonsMain & R_BUTTON) && (currentlyPressedButtons & DPAD_DOWN)) {
                 isMenuActive ^= 1;
             } else if (currentlyPressedButtons & DPAD_DOWN) {
-                saveOrLoadStateMode ^= 1;
+                savestateCurrentSlot ^= 1; //flip from 0 to 1 or vice versa (2 saveslots)
             } else {
                 checkInputsForSavestates();
             }
@@ -495,13 +472,14 @@ void mainCFunction(void) {
         }
 
         if (toggles[TOGGLE_HIDE_SAVESTATE_TEXT] == 1) {
-            if (saveOrLoadStateMode == SAVE_MODE) {
+            if (savestateCurrentSlot == 0) {
                 textBuffer2[0] =  0xA3;
-                textBuffer2[1] = 0x60 + 's';
+                textBuffer2[1] = 0xB1; //prints 1
             } else {
-                textBuffer2[0] = 0xA3;
-                textBuffer2[1] = 0x60 + 'l';
+                textBuffer2[0] =  0xA3;
+                textBuffer2[1] = 0xB2; //prints 2         
             }
+
             textBuffer2[2] = 0;
             textPrint(13.0f, 208.0f, 0.65f, &textBuffer2, 3);
         }
